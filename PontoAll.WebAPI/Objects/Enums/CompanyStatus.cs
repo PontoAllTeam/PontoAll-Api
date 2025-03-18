@@ -1,4 +1,4 @@
-﻿namespace PontoAll.WebAPI.Objects.Enuns
+﻿namespace PontoAll.WebAPI.Objects.Enums
 {
     public enum CompanyStatus
     {
