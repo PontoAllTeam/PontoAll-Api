@@ -1,8 +1,7 @@
 ﻿using PontoAll.WebAPI.Objects.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 
-namespace PontoAll.WebAPI.Models
+namespace PontoAll.WebAPI.Objects.Models
 {
     [Table("company")]
     public class Company
@@ -46,7 +45,7 @@ namespace PontoAll.WebAPI.Models
         [Column("status")]
         public CompanyStatus Status { get; set; }
 
-        public Company () 
+        public Company()
         {
 
         }
@@ -65,7 +64,7 @@ namespace PontoAll.WebAPI.Models
             Street = street;
             Neighborhood = neighborhood;
             Number = number;
-            Status = status;    
+            Status = status;
         }
     }
 }

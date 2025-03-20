@@ -1,4 +1,5 @@
-﻿using PontoAll.WebAPI.Objects.Enums;
+﻿using Microsoft.Extensions.Hosting;
+using PontoAll.WebAPI.Objects.Enums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PontoAll.WebAPI.Objects.Models
@@ -35,6 +36,8 @@ namespace PontoAll.WebAPI.Objects.Models
 
         [Column("status")]
         public UserStatus Status { get; set; }
+
+        public ICollection<User> Users { get; } = [];
 
         public User() { }
         public User(int id, string name, string cpf, string phone, string email, string recoveryEmail, string registration, string password, UserType type, UserStatus status)
