@@ -48,6 +48,11 @@ public class Scale
     [Column("pick10")]
     public TimeOnly? Pick10 { get; set; }
 
+    [Column("userid")]
+    public int UserId { get; set; }
+
+    public User User { get; set; } = null!;
+
     public Scale()
     {
 
