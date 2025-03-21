@@ -7,6 +7,7 @@ namespace PontoAll.WebAPI.Objects.Enums
         VACATION = 3,
         TIME_BANK = 4,
         ABSENCE = 5,
-        LEAVE_ABSENCE = 6
+        LEAVE_ABSENCE = 6,
+        WORK_DAY = 7,
     }
 }
