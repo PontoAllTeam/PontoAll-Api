@@ -45,11 +45,6 @@ namespace PontoAll.WebAPI.Objects.Models
         [Column("status")]
         public CompanyStatus Status { get; set; }
 
-        [Column("userid")]
-        public int UserId { get; set; }
-
-        public User User { get; set; } = null!;
-
         public Company()
         {
 
