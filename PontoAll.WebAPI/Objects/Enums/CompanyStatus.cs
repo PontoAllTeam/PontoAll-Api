@@ -1,8 +1,7 @@
-﻿namespace PontoAll.WebAPI.Objects.Enums
+﻿namespace PontoAll.WebAPI.Objects.Enums;
+
+public enum CompanyStatus
 {
-    public enum CompanyStatus
-    {
-        ACTIVE = 1,
-        INACTIVE = 2
-    }
+    ACTIVE = 1,
+    INACTIVE = 2
 }
