@@ -45,6 +45,8 @@ public class Company
     [Column("status")]
     public CompanyStatus Status { get; set; }
 
+    public ICollection<User> Users { get; } = [];
+
     public Company()
     {
 
