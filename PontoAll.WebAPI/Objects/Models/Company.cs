@@ -45,6 +45,8 @@ namespace PontoAll.WebAPI.Objects.Models
         [Column("status")]
         public CompanyStatus Status { get; set; }
 
+        public ICollection<User> Users { get; } = [];
+
         public Company()
         {
 

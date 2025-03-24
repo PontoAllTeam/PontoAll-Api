@@ -37,12 +37,11 @@ namespace PontoAll.WebAPI.Objects.Models
         [Column("status")]
         public UserStatus Status { get; set; }
 
-        [Column("userid")]
-        public int UserId { get; set; }
+        [Column("companyid")]
+        public int CompanyId { get; set; }
 
-        public User Company { get; set; } = null!;
+        public Company Company { get; set; } = null!;
 
-        public ICollection<User> Users { get; } = [];
 
         public User() { }
         public User(int id, string name, string cpf, string phone, string email, string recoveryEmail, string registration, string password, UserType type, UserStatus status)
