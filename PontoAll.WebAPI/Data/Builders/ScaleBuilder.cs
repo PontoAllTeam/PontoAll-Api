@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PontoAll.WebAPI.Objects.Enums;
 using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Data.Builders;
@@ -23,14 +22,5 @@ public class ScaleBuilder
         modelBuilder.Entity<Scale>().Property(s => s.Pick8);
         modelBuilder.Entity<Scale>().Property(s => s.Pick9);
         modelBuilder.Entity<Scale>().Property(s => s.Pick10);
-
-
-        modelBuilder.Entity<Scale>()
-            .HasData(new List<Scale>
-            {
-                new(1, 21, "2025/03", DayType.WORK_DAY),
-                new(2, 22, "2025/03", DayType.HOLIDAY),
-                new(3, 23, "2025/03", DayType.DAY_OFF),
-            });
     }
 }

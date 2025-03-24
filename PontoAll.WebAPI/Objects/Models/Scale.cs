@@ -58,11 +58,12 @@ public class Scale
 
     }
 
-    public Scale(int id, int day, string yearMonth, DayType dayType)
+    public Scale(int id, int day, string yearMonth, DayType dayType, int userId)
     {
         Id = id;
         Day = day;
         YearMonth = yearMonth;
         DayType = dayType;
+        UserId = userId;
     }
 }
