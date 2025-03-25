@@ -1,0 +1,8 @@
+using PontoAll.WebAPI.Objects.Models;
+
+namespace PontoAll.WebAPI.Services.Interfaces;
+
+public interface IScaleService : IGenericService<Scale>
+{
+
+}
