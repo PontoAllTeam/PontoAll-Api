@@ -1,5 +1,3 @@
-using PontoAll.WebAPI.Objects.Enums;
-
 namespace PontoAll.WebAPI.Objects.Dtos.Entities;
 
 public class ScaleDTO
