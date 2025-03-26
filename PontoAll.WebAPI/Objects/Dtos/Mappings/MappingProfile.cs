@@ -9,6 +9,7 @@ public class MappingProfile : Profile
     public MappingProfile()
     {
         CreateMap<ScaleDTO, Scale>().ReverseMap();
-
+        CreateMap<CompanyDTO, Company>().ReverseMap();
+        CreateMap<UserDTO, User>().ReverseMap();
     }
 }
