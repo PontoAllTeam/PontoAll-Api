@@ -73,7 +73,7 @@ namespace PontoAll.WebAPI.Controllers
             {
                 return StatusCode(500, "Ocorreu um erro ao tentar remover uma empresa.");
             }
-            return Ok("Empresa removida com suceso");
+            return Ok("Empresa removida com sucesso");
         }
     }
 }
