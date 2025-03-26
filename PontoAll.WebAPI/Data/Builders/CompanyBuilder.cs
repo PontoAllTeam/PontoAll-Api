@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using PontoAll.WebAPI.Objects.Models;
-using System.Threading;
 
 namespace PontoAll.WebAPI.Data.Builders;
 
