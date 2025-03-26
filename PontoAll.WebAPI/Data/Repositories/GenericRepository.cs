@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ï»¿using Microsoft.EntityFrameworkCore;
+=======
+using Microsoft.EntityFrameworkCore;
+>>>>>>> origin/dev
 using PontoAll.WebAPI.Data.Interfaces;
 
 namespace PontoAll.WebAPI.Data.Repositories;
@@ -32,6 +36,7 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
 
     public async Task Update(T entity)
     {
+<<<<<<< HEAD
         // Recupera a chave primï¿½ria (supondo que seja 'Id')
         var entityId = _context.Entry(entity).Property("Id").CurrentValue;
 
@@ -40,6 +45,16 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
             .FirstOrDefault(e => e.Property("Id").CurrentValue.Equals(entityId));
 
         // Se a entidade jï¿½ estiver sendo rastreada, desanexa
+=======
+        // Recupera a chave primária (supondo que seja 'Id')
+        var entityId = _context.Entry(entity).Property("Id").CurrentValue;
+
+        // Verifica se a entidade com o mesmo Id já está sendo rastreada
+        var trackedEntity = _context.ChangeTracker.Entries<T>()
+            .FirstOrDefault(e => e.Property("Id").CurrentValue.Equals(entityId));
+
+        // Se a entidade já estiver sendo rastreada, desanexa
+>>>>>>> origin/dev
         if (trackedEntity != null)
         {
             _context.Entry(trackedEntity.Entity).State = EntityState.Detached;
@@ -48,7 +63,11 @@ public class GenericRepository<T> : IGenericRepository<T> where T : class
         // Anexa a nova entidade e marca como 'Modified'
         _context.Entry(entity).State = EntityState.Modified;
 
+<<<<<<< HEAD
         // Salva as alteraï¿½ï¿½es no banco de dados
+=======
+        // Salva as alterações no banco de dados
+>>>>>>> origin/dev
         await SaveChanges();
     }
 

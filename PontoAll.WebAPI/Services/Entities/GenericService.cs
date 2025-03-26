@@ -1,4 +1,4 @@
-ï»¿using AutoMapper;
+using AutoMapper;
 using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Services.Interfaces;
 
@@ -49,7 +49,7 @@ public class GenericService<T> : IGenericService<T> where T : class
         var entity = await _repository.GetById(id);
         if (entity == null)
         {
-            throw new KeyNotFoundException($"Entidade com id: {id} nï¿½o encontrado");
+            throw new KeyNotFoundException($"Entidade com id: {id} não encontrado");
         }
 
         await _repository.Remove(entity);

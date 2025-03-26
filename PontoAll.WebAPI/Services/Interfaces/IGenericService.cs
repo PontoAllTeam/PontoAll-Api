@@ -1,4 +1,4 @@
-﻿namespace PontoAll.WebAPI.Services.Interfaces;
+namespace PontoAll.WebAPI.Services.Interfaces;
 
 public interface IGenericService<T> where T : class
 {

@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using PontoAll.WebAPI.Data;
-using System.Configuration;
+using PontoAll.WebAPI.Data.Interfaces;
+using PontoAll.WebAPI.Data.Repositories;
+using PontoAll.WebAPI.Services.Entities;
+using PontoAll.WebAPI.Services.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,7 +21,15 @@ else
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+//Scoped Services and Interfaces
+builder.Services.AddScoped<IScaleService, ScaleService>();
+
+//Scoped Repositories and Interfaces
+builder.Services.AddScoped<IScaleRepository, ScaleRepository>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

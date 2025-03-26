@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ﻿namespace PontoAll.WebAPI.Data.Interfaces;
+=======
+namespace PontoAll.WebAPI.Data.Interfaces;
+>>>>>>> origin/dev
 
 public interface IGenericRepository<T> where T : class
 {

@@ -21,6 +21,11 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
+    <Folder Include="Data\Interfaces\" />
+    <Folder Include="Data\Repositories\" />
+    <Folder Include="Objects\Dtos\Mappings\" />
+    <Folder Include="Services\Interfaces\" />
+    <Folder Include="Services\Entities\" />
   </ItemGroup>
 
 </Project>
