@@ -25,7 +25,7 @@ namespace PontoAll.WebAPI.Controllers
             return Ok(companies);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")] 
         public async Task<IActionResult> GetById(int id)
         {
             var companies = await _companyService.GetById(id);
