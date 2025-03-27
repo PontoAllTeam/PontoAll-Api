@@ -4,7 +4,7 @@ using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Services.Entities;
 
-public class GenericService<T> : IGenericService<T> where T : class
+public class GenericService<T, TDto> : IGenericService<T, TDto> where T : class where TDto : class
 {
     private readonly IGenericRepository<T> _repository;
     private readonly IMapper _mapper;
@@ -15,24 +15,25 @@ public class GenericService<T> : IGenericService<T> where T : class
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<T>> GetAll()
+    public async Task<IEnumerable<TDto>> GetAll()
     {
         var entities = await _repository.Get();
-        return _mapper.Map<IEnumerable<T>>(entities);
+        return _mapper.Map<IEnumerable<TDto>>(entities);
     }
 
-    public async Task<T> GetById(int id)
+    public async Task<TDto> GetById(int id)
     {
         var entity = await _repository.GetById(id);
-        return _mapper.Map<T>(entity);
+        return _mapper.Map<TDto>(entity);
     }
 
-    public async Task Create(T entity)
+    public async Task Create(TDto entityDTO)
     {
+        var entity = _mapper.Map<T>(entityDTO);
         await _repository.Add(entity);
     }
 
-    public async Task Update(T entity, int id)
+    public async Task Update(TDto entityDTO, int id)
     {
         var existingEntity = await _repository.GetById(id); // Supondo que sua entidade tenha um campo Id
 
@@ -41,6 +42,7 @@ public class GenericService<T> : IGenericService<T> where T : class
             throw new KeyNotFoundException($"Entity with id {id} not found.");
         }
 
+        var entity = _mapper.Map<T>(entityDTO);
         await _repository.Update(entity);
     }
 
