@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using PontoAll.WebAPI.Objects.Models;
+using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Controllers;
@@ -33,31 +33,31 @@ public class ScaleController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(Scale scale)
+    public async Task<IActionResult> Post(ScaleDTO scaleDTO)
     {
         try
         {
-            await _scaleService.Create(scale);
+            await _scaleService.Create(scaleDTO);
         }
         catch (Exception ex)
         {
             return StatusCode(500, "Ocorreu um erro ao tentar inserir uma nova escala");
         }
-        return Ok(scale);
+        return Ok(scaleDTO);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, Scale scale)
+    public async Task<IActionResult> Put(int id, ScaleDTO scaleDTO)
     {
         try
         {
-            await _scaleService.Update(scale, id);
+            await _scaleService.Update(scaleDTO, id);
         }
         catch (Exception ex)
         {
             return StatusCode(500, "Ocorreu um erro ao tentar atualizar os dados da escala" + ex.Message);
         }
-        return Ok(scale);
+        return Ok(scaleDTO);
     }
 
     [HttpDelete("{id}")]
