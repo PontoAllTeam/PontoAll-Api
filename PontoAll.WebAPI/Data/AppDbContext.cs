@@ -10,12 +10,12 @@ public class AppDbContext : DbContext
 
     public DbSet<Scale> Scales { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<Company> Companies { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         ScaleBuilder.Build(modelBuilder);
+        UserBuilder.Build(modelBuilder);
     }
 }

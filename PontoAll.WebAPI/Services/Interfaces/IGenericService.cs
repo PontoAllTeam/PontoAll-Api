@@ -1,10 +1,10 @@
 namespace PontoAll.WebAPI.Services.Interfaces;
 
-public interface IGenericService<T, TDto> where T : class where TDto : class
+public interface IGenericService<T> where T : class
 {
-    Task<IEnumerable<TDto>> GetAll();
-    Task<TDto> GetById(int id);
-    Task Create(TDto entityDTO);
-    Task Update(TDto entityDTO, int id);
+    Task<IEnumerable<T>> GetAll();
+    Task<T> GetById(int id);
+    Task Create(T entity);
+    Task Update(T entity, int id);
     Task Remove(int id);
 }
