@@ -26,9 +26,10 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 //Scoped Services and Interfaces
 builder.Services.AddScoped<IScaleService, ScaleService>();
-
+builder.Services.AddScoped<IUserService, UserService>();
 //Scoped Repositories and Interfaces
 builder.Services.AddScoped<IScaleRepository, ScaleRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
