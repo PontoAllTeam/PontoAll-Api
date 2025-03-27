@@ -3,6 +3,7 @@ using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Services.Interfaces;
 
-public interface IUserService : IGenericService<User, UserDTO>
+public interface ICompanyService : IGenericService<Company, CompanyDTO>
 {
+
 }
