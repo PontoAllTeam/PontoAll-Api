@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PontoAll.WebAPI.Objects.Models;
-using PontoAll.WebAPI.Services.Entities;
+using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
-using System.Threading;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -14,18 +12,15 @@ public class UserController : Controller
 
     public UserController(IUserService userService)
     {
-        this._userService = userService;
+        _userService = userService;
     }
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-
         var users = await _userService.GetAll();
         return Ok(users);
-
     }
-
-
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -37,31 +32,31 @@ public class UserController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(User user)
+    public async Task<IActionResult> Post(UserDTO userDTO)
     {
         try
         {
-            await _userService.Create(user);
+            await _userService.Create(userDTO);
         }
         catch (Exception ex)
         {
             return StatusCode(500, "Ocorreu um erro ao tentar inserir um novo usuário");
         }
-        return Ok(user);
+        return Ok(userDTO);
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, User user)
+    public async Task<IActionResult> Put(int id, UserDTO userDTO)
     {
         try
         {
-            await _userService.Update(user, id);
+            await _userService.Update(userDTO, id);
         }
         catch (Exception ex)
         {
             return StatusCode(500, "Ocorreu um erro ao tentar atualizar os dados do usuário" + ex.Message);
         }
-        return Ok(user);
+        return Ok(userDTO);
     }
 
     [HttpDelete("{id}")]
@@ -75,7 +70,7 @@ public class UserController : Controller
         {
             return StatusCode(500, "Ocorreu um erro ao tentar remover um usuário.");
         }
-        return Ok("Usuário removida com suceso");
+        return Ok("Usuário removida com sucesso");
     }
 }
 
