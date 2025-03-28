@@ -70,7 +70,7 @@ public class UserController : Controller
         {
             return StatusCode(500, "Ocorreu um erro ao tentar remover um usuário.");
         }
-        return Ok("Usuário removida com sucesso");
+        return Ok("Usuário removido com sucesso");
     }
 }
 
