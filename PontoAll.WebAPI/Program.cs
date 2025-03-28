@@ -1,9 +1,39 @@
+using Microsoft.EntityFrameworkCore;
+using PontoAll.WebAPI.Data;
+using PontoAll.WebAPI.Data.Interfaces;
+using PontoAll.WebAPI.Data.Repositories;
+using PontoAll.WebAPI.Services.Entities;
+using PontoAll.WebAPI.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
+if (env == "Production")
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
+else
+{
+    builder.Services.AddDbContext<AppDbContext>(options =>
+        options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+}
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+//Scoped Services and Interfaces
+builder.Services.AddScoped<IScaleService, ScaleService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ICompanyService, CompanyService>();
+
+//Scoped Repositories and Interfaces
+builder.Services.AddScoped<IScaleRepository, ScaleRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
