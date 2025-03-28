@@ -6,15 +6,14 @@ using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Services.Entities;
 
-public class CompanyService : GenericService<Company, CompanyDTO>, ICompanyService
+public class UserService : GenericService<User, UserDTO>, IUserService
 {
-    private readonly ICompanyRepository _companyRepository;
+    private readonly IUserRepository _userRepository;
     private readonly IMapper _mapper;
 
-    public CompanyService(ICompanyRepository repository, IMapper mapper) : base(repository, mapper)
+    public UserService(IUserRepository repository, IMapper mapper) : base(repository, mapper)
     {
-        _companyRepository = repository;
+        _userRepository = repository;
         _mapper = mapper;
     }
-
 }

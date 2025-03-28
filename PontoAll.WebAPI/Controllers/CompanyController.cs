@@ -1,79 +1,76 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PontoAll.WebAPI.Objects.Models;
-using PontoAll.WebAPI.Services.Entities;
+using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
-using System.Threading;
 
-namespace PontoAll.WebAPI.Controllers
+namespace PontoAll.WebAPI.Controllers;
+
+[ApiController]
+[Route("api/v1/[controller]")]
+public class CompanyController : Controller
 {
-    [ApiController]
-    [Route("api/v1/[controller]")]
-    public class CompanyController : Controller
+
+    private readonly ICompanyService _companyService;
+
+    public CompanyController(ICompanyService companyService)
     {
+        this._companyService = companyService;
+    }
 
-        private readonly ICompanyService _companyService;
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var companies = await _companyService.GetAll();
+        return Ok(companies);
+    }
 
-        public CompanyController(ICompanyService companyService)
+    [HttpGet("{id}")] 
+    public async Task<IActionResult> GetById(int id)
+    {
+        var companies = await _companyService.GetById(id);
+        if (companies == null)
+            return NotFound("Empresa não encontrada");
+        return Ok(companies);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post(CompanyDTO companyDTO)
+    {
+        try
         {
-            this._companyService = companyService;
+            await _companyService.Create(companyDTO);
         }
-
-        [HttpGet]
-        public async Task<IActionResult> GetAll()
+        catch (Exception ex)
         {
-            var companies = await _companyService.GetAll();
-            return Ok(companies);
+            return StatusCode(500, "Ocorreu um erro ao tentar inserir uma nova empresa");
         }
+        return Ok(companyDTO);
+    }
 
-        [HttpGet("{id}")] 
-        public async Task<IActionResult> GetById(int id)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, CompanyDTO companyDTO)
+    {
+        try
         {
-            var companies = await _companyService.GetById(id);
-            if (companies == null)
-                return NotFound("Empresa não encontrada");
-            return Ok(companies);
+            await _companyService.Update(companyDTO, id);
         }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Ocorreu um erro ao tentar atualizar os dados da empresa" + ex.Message);
+        }
+        return Ok(companyDTO);
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Post(Company company)
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
         {
-            try
-            {
-                await _companyService.Create(company);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Ocorreu um erro ao tentar inserir uma nova empresa");
-            }
-            return Ok(company);
+            await _companyService.Remove(id);
         }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, Company company)
+        catch (Exception ex)
         {
-            try
-            {
-                await _companyService.Update(company, id);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Ocorreu um erro ao tentar atualizar os dados da empresa" + ex.Message);
-            }
-            return Ok(company);
+            return StatusCode(500, "Ocorreu um erro ao tentar remover uma empresa.");
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
-        {
-            try
-            {
-                await _companyService.Remove(id);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Ocorreu um erro ao tentar remover uma empresa.");
-            }
-            return Ok("Empresa removida com sucesso");
-        }
+        return Ok("Empresa removida com sucesso");
     }
 }
