@@ -17,5 +17,6 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         ScaleBuilder.Build(modelBuilder);
+        CompanyBuilder.Build(modelBuilder);
     }
 }
