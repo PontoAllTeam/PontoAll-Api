@@ -11,5 +11,6 @@ public class MappingProfile : Profile
         CreateMap<ScaleDTO, Scale>().ReverseMap();
         CreateMap<CompanyDTO, Company>().ReverseMap();
         CreateMap<UserDTO, User>().ReverseMap();
+        CreateMap<DepartmentDTO, Department>().ReverseMap();
     }
 }
