@@ -15,10 +15,11 @@ public class Department
     public int CompanyId { get; set; }
     public Company Company { get; set; } = null;
     public Department() { }
-    public Department(int id, string name)
+    public Department(int id, string name, int companyId)
     {
         Id = id;
         Name = name;
+        CompanyId = companyId;
     }
 
 }
