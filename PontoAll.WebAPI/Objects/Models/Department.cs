@@ -11,6 +11,9 @@ public class Department
     [Column("name")]
     public string Name { get; set; }
 
+    [Column("companyid")]
+    public int CompanyId { get; set; }
+    public Company Company { get; set; } = null;
     public Department() { }
     public Department(int id, string name)
     {
