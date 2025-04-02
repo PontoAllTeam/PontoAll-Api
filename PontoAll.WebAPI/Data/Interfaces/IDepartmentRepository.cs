@@ -4,4 +4,5 @@ namespace PontoAll.WebAPI.Data.Interfaces;
 
 public interface IDepartmentRepository : IGenericRepository<Department>
 {
+
 }
