@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Scale> Scales { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Company> Companies { get; set; }
+    public DbSet<Department> Departments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -19,5 +20,6 @@ public class AppDbContext : DbContext
         ScaleBuilder.Build(modelBuilder);
         CompanyBuilder.Build(modelBuilder);
         UserBuilder.Build(modelBuilder);
+        DepartmentBuilder.Builder(modelBuilder);
     }
 }
