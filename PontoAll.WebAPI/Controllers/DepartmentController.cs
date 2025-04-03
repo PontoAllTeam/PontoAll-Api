@@ -18,17 +18,17 @@ public class DepartmentController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var departmenties = await _departmentService.GetAll();
-        return Ok(departmenties);
+        var departments = await _departmentService.GetAll();
+        return Ok(departments);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var departmenties = await _departmentService.GetById(id);
-        if (departmenties == null)
-            return NotFound("Departamento não encontrada");
-        return Ok(departmenties);
+        var departments = await _departmentService.GetById(id);
+        if (departments == null)
+            return NotFound("Departamento não encontrado");
+        return Ok(departments);
     }
 
     [HttpPost]
