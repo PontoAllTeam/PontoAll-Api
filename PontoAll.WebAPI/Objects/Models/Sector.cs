@@ -15,9 +15,10 @@ public class Sector
     public Department Department { get; set; } = null;
 
     public Sector() { }
-    public Sector(int id, string name)
+    public Sector(int id, string name, int departmentId)
     {
         Id = id;
         Name = name;
+        DepartmentId = departmentId;
     }
 }
