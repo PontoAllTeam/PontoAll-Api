@@ -5,7 +5,7 @@ namespace PontoAll.WebAPI.Objects.Utils;
 
 public static class StringUtils
 {
-    public static string Normalize(this string text)
+    public static string NormalizeText(this string text)
     {
         if (string.IsNullOrWhiteSpace(text))
             return text;
@@ -32,4 +32,9 @@ public static class StringUtils
 
         return new string(text.Where(char.IsDigit).ToArray());
     }
+
+    public static bool CompareString(string str1, string str2)
+	{
+		return string.Equals(str1.NormalizeText(), str2.NormalizeText(), StringComparison.OrdinalIgnoreCase);
+	}
 }
