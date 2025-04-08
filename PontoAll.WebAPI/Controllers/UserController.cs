@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
+using PontoAll.WebAPI.Objects.Utils;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -34,6 +36,18 @@ public class UserController : Controller
     [HttpPost]
     public async Task<IActionResult> Post(UserDTO userDTO)
     {
+        if (!CheckUserInfo(userDTO))
+        {
+            return BadRequest("Formato incorreto de email ou telefone");
+        }
+
+        var usersDTO = await _userService.GetAll();
+
+        if (CheckDuplicates(usersDTO, userDTO))
+        {
+            return BadRequest("Esse e-mail já está em uso");
+        }
+
         try
         {
             await _userService.Create(userDTO);
@@ -48,6 +62,18 @@ public class UserController : Controller
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(int id, UserDTO userDTO)
     {
+        if (!CheckUserInfo(userDTO))
+        {
+            return BadRequest("Formato incorreto de email ou telefone");
+        }
+
+        var usersDTO = await _userService.GetAll();
+
+        if (CheckDuplicates(usersDTO, userDTO))
+        {
+            return BadRequest("Esse e-mail já está em uso");
+        }
+
         try
         {
             await _userService.Update(userDTO, id);
@@ -71,6 +97,33 @@ public class UserController : Controller
             return StatusCode(500, "Ocorreu um erro ao tentar remover um usuário.");
         }
         return Ok("Usuário removido com sucesso");
+    }
+
+    private static bool CheckUserInfo(UserDTO userDTO)
+    {
+        bool isValidPhone = PhoneValidator.IsValidPhone(userDTO.Phone);
+        bool isValidEmail = EmailValidator.IsValidEmail(userDTO.Email);
+        bool isValidRecoveryEmail = EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
+
+        return isValidPhone && isValidEmail && isValidRecoveryEmail;
+    }
+
+    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
+	{
+        foreach (var user in usersDTO)
+        {
+            if (userDTO.Id == user.Id)
+		    {
+			    continue;
+		    }
+
+		    if (StringUtils.CompareString(userDTO.Email, user.Email))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
 

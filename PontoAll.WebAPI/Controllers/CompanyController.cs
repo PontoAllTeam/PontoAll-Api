@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
+using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Controllers;
@@ -35,6 +36,11 @@ public class CompanyController : Controller
     [HttpPost]
     public async Task<IActionResult> Post(CompanyDTO companyDTO)
     {
+        if (!CheckCompanyInfo(companyDTO))
+        {
+            return BadRequest("Formato incorreto de email ou telefone");
+        }
+
         try
         {
             await _companyService.Create(companyDTO);
@@ -49,6 +55,11 @@ public class CompanyController : Controller
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(int id, CompanyDTO companyDTO)
     {
+        if (!CheckCompanyInfo(companyDTO))
+        {
+            return BadRequest("Formato incorreto de email ou telefone");
+        }
+
         try
         {
             await _companyService.Update(companyDTO, id);
@@ -72,5 +83,13 @@ public class CompanyController : Controller
             return StatusCode(500, "Ocorreu um erro ao tentar remover uma empresa.");
         }
         return Ok("Empresa removida com sucesso");
+    }
+
+    private static bool CheckCompanyInfo(CompanyDTO companyDTO)
+    {
+        bool isValidPhone = PhoneValidator.IsValidPhone(companyDTO.BusinessPhone);
+        bool isValidEmail = EmailValidator.IsValidEmail(companyDTO.Email);
+
+        return isValidPhone && isValidEmail;
     }
 }
