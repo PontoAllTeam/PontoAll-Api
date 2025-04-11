@@ -18,6 +18,14 @@ public class UserService : GenericService<User, UserDTO>, IUserService
         _mapper = mapper;
     }
 
+    public async Task<UserDTO> GetByEmail(string email)
+    {
+        var userModel = await _userRepository.GetByEmail(email);
+
+        if (userModel != null) userModel.Password = "";
+        return _mapper.Map<UserDTO>(userModel);
+    }
+
     public async Task<UserDTO> Login(Login login)
     {
         var userModel = await _userRepository.Login(login);
