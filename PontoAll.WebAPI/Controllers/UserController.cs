@@ -2,6 +2,7 @@
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Utils;
+using PontoAll.WebAPI.Objects.Contracts;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -56,6 +57,85 @@ public class UserController : Controller
             return StatusCode(500, "Ocorreu um erro ao tentar inserir um novo usuário");
         }
         return Ok(userDTO);
+    }
+
+    [HttpPost("Login")]
+    public async Task<ActionResult> Login([FromBody] Login login)
+    {
+        if (login is null)
+        {
+            return BadRequest("Dado(s) inválido");
+        }
+
+        try
+        {
+            login.Password = StringUtils.HashString(login.Password);
+            var userDTO = await _userService.Login(login);
+
+            if (userDTO is null)
+            {
+                return BadRequest("Login inválido");
+            }
+
+            var token = new Token();
+            token.GenerateToken(userDTO.Email);
+
+            return Ok(token);
+        }
+        catch (Exception ex)
+        {
+            var errorData = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, errorData);
+        }
+    }
+
+    [HttpPost("Validate")]
+    public async Task<ActionResult> Validate([FromBody] Token token)
+    {
+        if (token is null)
+        {
+            return BadRequest("Dado inválido");
+        }
+
+        try
+        {
+            var email = token.ExtractSubject();
+
+            if (string.IsNullOrEmpty(email) || await _userService.GetByEmail(email) == null)
+            {
+                _response.SetUnauthorized();
+                _response.Message = "Token inválido";
+                _response.Data = new { errorToken = "Token inválido" };
+                return BadRequest(_response);
+            }
+            else if (!token.ValidateToken())
+            {
+                _response.SetUnauthorized();
+                _response.Message = "Token inválido";
+                _response.Data = new { errorToken = "Token inválido" };
+                return BadRequest(_response);
+            }
+
+            _response.SetSuccess();
+            _response.Message = "Token validado com sucesso";
+            _response.Data = token;
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.SetError();
+            _response.Message = "Não foi possível validar o token";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
     }
 
     [HttpPut("{id}")]
