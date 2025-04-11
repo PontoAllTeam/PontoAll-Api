@@ -2,7 +2,6 @@
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PontoAll.WebAPI.Controllers;
 
