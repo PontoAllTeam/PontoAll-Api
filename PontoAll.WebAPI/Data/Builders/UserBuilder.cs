@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PontoAll.WebAPI.Objects.Enums;
 using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Data.Builders;
@@ -17,5 +18,10 @@ public class UserBuilder
         modelBuilder.Entity<User>().Property(s => s.Password).IsRequired().HasMaxLength(100);
         modelBuilder.Entity<User>().Property(s => s.Type).IsRequired();
         modelBuilder.Entity<User>().Property(s => s.Status).IsRequired();
+
+        modelBuilder.Entity<User>().HasData(new List<User>
+        {
+            new(1, "Carlos", "12312312389", "12798798798", "carlos.gabriel@gmail.com", "carlin@outlook.com", "241251251", "123456", UserType.DIRECTOR, UserStatus.ACTIVE, 1),
+        });
     }
 }

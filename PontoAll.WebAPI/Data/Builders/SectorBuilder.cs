@@ -9,5 +9,10 @@ public class SectorBuilder
     {
         modelBuilder.Entity<Sector>().HasKey(s => s.Id);
         modelBuilder.Entity<Sector>().Property(s => s.Name).IsRequired().HasMaxLength(100);
+
+        modelBuilder.Entity<Sector>().HasData(new List<Sector>
+        {
+            new(1, "Recrutamento e Seleção", 2),
+        });
     }
 }

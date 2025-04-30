@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PontoAll.WebAPI.Objects.Enums;
 using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Data.Builders;
@@ -20,5 +21,10 @@ public class CompanyBuilder
         modelBuilder.Entity<Company>().Property(s => s.Neighborhood).IsRequired().HasMaxLength(100);
         modelBuilder.Entity<Company>().Property(s => s.Number).IsRequired().HasMaxLength(5);
         modelBuilder.Entity<Company>().Property(s => s.Status).IsRequired();
+
+        modelBuilder.Entity<Company>().HasData(new List<Company>
+        {
+            new(1, "Coca Cola Industrias Ltda", "Coca Cola", "45997418000153", "cobranca@kof.com.mx", "11976212763", "SP", "Jundiaí", "13212240", "Rodovia Dom Gabriel Paulino Bueno Couto", "Jardim Tannus", 0, CompanyStatus.ACTIVE),
+        });
     }
 }
