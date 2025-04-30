@@ -28,7 +28,7 @@ public class UserController : Controller
     public async Task<IActionResult> GetById(int id)
     {
         var users = await _userService.GetById(id);
-        if (users == null)
+        if (users is null)
             return NotFound("Usuário não encontrado");
         return Ok(users);
     }
@@ -36,26 +36,35 @@ public class UserController : Controller
     [HttpPost]
     public async Task<IActionResult> Post(UserDTO userDTO)
     {
-        if (!CheckUserInfo(userDTO))
+        if (userDTO is null)
         {
-            return BadRequest("Formato incorreto de email ou telefone");
-        }
-
-        var usersDTO = await _userService.GetAll();
-
-        if (CheckDuplicates(usersDTO, userDTO))
-        {
-            return BadRequest("Esse e-mail já está em uso");
-        }
-
+            return BadRequest("Dados inválidos");
+        } 
+        
         try
         {
+            if (!CheckUserInfo(userDTO))
+            {
+                return BadRequest("Formato incorreto de email ou telefone");
+            }
+
+            userDTO.Id = 0;
+            var usersDTO = await _userService.GetAll();
+
+            if (CheckDuplicates(usersDTO, userDTO))
+            {
+                return BadRequest("Esse e-mail já está em uso");
+            }
+
+            userDTO.Password = StringUtils.HashString(userDTO.Password);
             await _userService.Create(userDTO);
         }
         catch (Exception ex)
         {
             return StatusCode(500, "Ocorreu um erro ao tentar inserir um novo usuário");
         }
+
+        userDTO.Password = "";
         return Ok(userDTO);
     }
 
@@ -67,6 +76,11 @@ public class UserController : Controller
             return BadRequest("Dado(s) inválido");
         }
 
+        if (!EmailValidator.IsValidEmail(login.Email))
+        {
+            return BadRequest("Formato de email incorreto");
+        }
+
         try
         {
             login.Password = StringUtils.HashString(login.Password);
@@ -74,7 +88,7 @@ public class UserController : Controller
 
             if (userDTO is null)
             {
-                return BadRequest("Login inválido");
+                return BadRequest("Email ou senha incorretos");
             }
 
             var token = new Token();
@@ -107,60 +121,63 @@ public class UserController : Controller
 
             if (string.IsNullOrEmpty(email) || await _userService.GetByEmail(email) == null)
             {
-                _response.SetUnauthorized();
-                _response.Message = "Token inválido";
-                _response.Data = new { errorToken = "Token inválido" };
-                return BadRequest(_response);
+                return Unauthorized("Token inválido");
             }
             else if (!token.ValidateToken())
             {
-                _response.SetUnauthorized();
-                _response.Message = "Token inválido";
-                _response.Data = new { errorToken = "Token inválido" };
-                return BadRequest(_response);
+                return Unauthorized("Token inválido");
             }
 
-            _response.SetSuccess();
-            _response.Message = "Token validado com sucesso";
-            _response.Data = token;
-            return Ok(_response);
+            return Ok(token);
         }
         catch (Exception ex)
         {
-            _response.SetError();
-            _response.Message = "Não foi possível validar o token";
-            _response.Data = new
+            var errorData = new
             {
                 ErrorMessage = ex.Message,
                 StackTrace = ex.StackTrace ?? "No stack trace available"
             };
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+            return StatusCode(StatusCodes.Status500InternalServerError, errorData);
         }
     }
 
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(int id, UserDTO userDTO)
     {
-        if (!CheckUserInfo(userDTO))
+        if (userDTO is null)
         {
-            return BadRequest("Formato incorreto de email ou telefone");
-        }
-
-        var usersDTO = await _userService.GetAll();
-
-        if (CheckDuplicates(usersDTO, userDTO))
-        {
-            return BadRequest("Esse e-mail já está em uso");
+            return BadRequest("Dados inválidos");
         }
 
         try
         {
+            var existingUserDTO = await _userService.GetById(userDTO.Id);
+            if (existingUserDTO is null)
+            {
+                return NotFound("O usuário informado não existe!");
+            }
+
+            if (!CheckUserInfo(userDTO))
+            {
+                return BadRequest("Formato incorreto de email ou telefone");
+            }
+
+            var usersDTO = await _userService.GetAll();
+
+            if (CheckDuplicates(usersDTO, userDTO))
+            {
+                return BadRequest("Esse e-mail já está em uso");
+            }
+
+            // userDTO.Password = StringUtils.HashString(userDTO.Password);
             await _userService.Update(userDTO, id);
         }
         catch (Exception ex)
         {
             return StatusCode(500, "Ocorreu um erro ao tentar atualizar os dados do usuário" + ex.Message);
         }
+
+        userDTO.Password = "";
         return Ok(userDTO);
     }
 
