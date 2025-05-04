@@ -3,11 +3,14 @@ using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Objects.Contracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PontoAll.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UserController : Controller
 {
     private readonly IUserService _userService;
@@ -69,6 +72,7 @@ public class UserController : Controller
     }
 
     [HttpPost("Login")]
+    [AllowAnonymous]
     public async Task<ActionResult> Login([FromBody] Login login)
     {
         if (login is null)
@@ -108,6 +112,7 @@ public class UserController : Controller
     }
 
     [HttpPost("Validate")]
+    [AllowAnonymous]
     public async Task<ActionResult> Validate([FromBody] Token token)
     {
         if (token is null)

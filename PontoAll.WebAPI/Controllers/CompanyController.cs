@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Interfaces;
@@ -7,6 +9,7 @@ namespace PontoAll.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class CompanyController : Controller
 {
 
@@ -24,7 +27,7 @@ public class CompanyController : Controller
         return Ok(companies);
     }
 
-    [HttpGet("{id}")] 
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
         var companies = await _companyService.GetById(id);
