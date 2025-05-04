@@ -21,7 +21,7 @@ public class UserBuilder
 
         modelBuilder.Entity<User>().HasData(new List<User>
         {
-            new(1, "Carlos", "12312312389", "12798798798", "carlos.gabriel@gmail.com", "carlin@outlook.com", "241251251", "123456", UserType.DIRECTOR, UserStatus.ACTIVE, 1),
+            new(1, "Carlos", "12312312389", "12798798798", "carlos.gabriel@gmail.com", "carlin@outlook.com", "241251251", "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", UserType.DIRECTOR, UserStatus.ACTIVE, 1),
         });
     }
 }
