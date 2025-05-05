@@ -14,10 +14,12 @@ namespace PontoAll.WebAPI.Controllers;
 public class UserController : Controller
 {
     private readonly IUserService _userService;
+    private readonly ITokenService _tokenService;
 
-    public UserController(IUserService userService)
+    public UserController(IUserService userService, ITokenService tokenService)
     {
         _userService = userService;
+        _tokenService = tokenService;
     }
 
     [HttpGet]
@@ -95,8 +97,7 @@ public class UserController : Controller
                 return BadRequest("Email ou senha incorretos");
             }
 
-            var token = new Token();
-            token.GenerateToken(userDTO.Email);
+            var token = _tokenService.GenerateToken(userDTO);
 
             return Ok(token);
         }
@@ -113,7 +114,7 @@ public class UserController : Controller
 
     [HttpPost("Validate")]
     [AllowAnonymous]
-    public async Task<ActionResult> Validate([FromBody] Token token)
+    public async Task<ActionResult> Validate([FromBody] string token)
     {
         if (token is null)
         {
@@ -122,13 +123,13 @@ public class UserController : Controller
 
         try
         {
-            var email = token.ExtractSubject();
+            var email = _tokenService.ExtractSubjectEmail(token);
 
             if (string.IsNullOrEmpty(email) || await _userService.GetByEmail(email) == null)
             {
                 return Unauthorized("Token inválido");
             }
-            else if (!token.ValidateToken())
+            else if (!await _tokenService.ValidateToken(token))
             {
                 return Unauthorized("Token inválido");
             }
