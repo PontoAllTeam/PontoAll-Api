@@ -5,18 +5,17 @@ public class EmailValidator
     public static bool IsValidEmail(string email)
     {
         int atPosition = email.IndexOf('@');
-        int atCount = email.Count(c => c == '@');
 
         bool hasTextBeforeAt = atPosition > 0;
-        bool hasTextAfterAt = email.LastIndexOf('@') < email.Length - 1;
-        bool hasDotAfterAt = atPosition >= 0 && email.IndexOf('.', atPosition) > atPosition;
+        bool hasTextAfterAt = atPosition >= 0 && email.LastIndexOf('@') < email.Length - 1;
+        bool hasDotAfterAt = atPosition >= 0 && email.LastIndexOf('.') > atPosition;
         bool endsWithDot = email.EndsWith('.');
-        bool hasSingleAt = atCount != 1;
+        bool hasSingleAt = email.Count(c => c == '@') == 1;
 
-        return hasSingleAt ||
-               hasTextBeforeAt ||
-               hasTextAfterAt ||
-               hasDotAfterAt ||
+        return hasSingleAt &&
+               hasTextBeforeAt &&
+               hasTextAfterAt &&
+               hasDotAfterAt &&
                !endsWithDot;
     }
 }
