@@ -24,10 +24,10 @@ public class ScaleController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var scales = await _scaleService.GetAll();
+        var scalesDTO = await _scaleService.GetAll();
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = scales;
+        _response.Data = scalesDTO;
         _response.Message = "Escalas listadas com sucesso";
 
         return Ok(_response);
@@ -36,19 +36,19 @@ public class ScaleController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var scale = await _scaleService.GetById(id);
+        var scaleDTO = await _scaleService.GetById(id);
 
-        if (scale is null)
+        if (scaleDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = scale;
+            _response.Data = null;
             _response.Message = "Escala não encontrada";
 
             return NotFound(_response);
         }
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = scale;
+        _response.Data = scaleDTO;
         _response.Message = "Escala listada com sucesso";
 
         return Ok(_response);
@@ -60,7 +60,7 @@ public class ScaleController : Controller
         if (scaleDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = scaleDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -95,7 +95,7 @@ public class ScaleController : Controller
         if (scaleDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = scaleDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -103,8 +103,8 @@ public class ScaleController : Controller
 
         try
         {
-            var existingScale = await _scaleService.GetById(id);
-            if (existingScale is null)
+            var existingScaleDTO = await _scaleService.GetById(id);
+            if (existingScaleDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
@@ -138,8 +138,8 @@ public class ScaleController : Controller
     {
         try
         {
-            var existingScale = await _scaleService.GetById(id);
-            if (existingScale is null)
+            var existingScaleDTO = await _scaleService.GetById(id);
+            if (existingScaleDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;

@@ -25,10 +25,10 @@ public class CompanyController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var companies = await _companyService.GetAll();
+        var companiesDTO = await _companyService.GetAll();
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = companies;
+        _response.Data = companiesDTO;
         _response.Message = "Empresas listadas com sucesso";
 
         return Ok(_response);
@@ -37,19 +37,19 @@ public class CompanyController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var company = await _companyService.GetById(id);
+        var companyDTO = await _companyService.GetById(id);
 
-        if (company is null)
+        if (companyDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = company;
+            _response.Data = null;
             _response.Message = "Empresa não encontrada";
 
             return NotFound(_response);
         }
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = company;
+        _response.Data = companyDTO;
         _response.Message = "Empresa listada com sucesso";
 
         return Ok(_response);
@@ -61,7 +61,7 @@ public class CompanyController : Controller
         if (companyDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = companyDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -105,7 +105,7 @@ public class CompanyController : Controller
         if (companyDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = companyDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -122,8 +122,8 @@ public class CompanyController : Controller
 
         try
         {
-            var existingCompany = await _companyService.GetById(id);
-            if (existingCompany is null)
+            var existingCompanyDTO = await _companyService.GetById(id);
+            if (existingCompanyDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
@@ -157,8 +157,8 @@ public class CompanyController : Controller
     {
         try
         {
-            var existingCompany = await _companyService.GetById(id);
-            if (existingCompany is null)
+            var existingCompanyDTO = await _companyService.GetById(id);
+            if (existingCompanyDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;

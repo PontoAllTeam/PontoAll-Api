@@ -24,10 +24,10 @@ public class DepartmentController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var departments = await _departmentService.GetAll();
+        var departmentsDTO = await _departmentService.GetAll();
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = departments;
+        _response.Data = departmentsDTO;
         _response.Message = "Departamentos listados com sucesso";
 
         return Ok(_response);
@@ -36,19 +36,19 @@ public class DepartmentController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var department = await _departmentService.GetById(id);
+        var departmentDTO = await _departmentService.GetById(id);
 
-        if (department is null)
+        if (departmentDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = department;
+            _response.Data = null;
             _response.Message = "Departamento não encontrado";
 
             return NotFound(_response);
         }
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = department;
+        _response.Data = departmentDTO;
         _response.Message = "Departamento listado com sucesso";
 
         return Ok(_response);
@@ -60,7 +60,7 @@ public class DepartmentController : Controller
         if (departmentDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = departmentDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -95,7 +95,7 @@ public class DepartmentController : Controller
         if (departmentDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = departmentDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -103,8 +103,8 @@ public class DepartmentController : Controller
 
         try
         {
-            var existingDepartment = await _departmentService.GetById(id);
-            if (existingDepartment is null)
+            var existingDepartmentDTO = await _departmentService.GetById(id);
+            if (existingDepartmentDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
@@ -138,8 +138,8 @@ public class DepartmentController : Controller
     {
         try
         {
-            var existingDepartment = await _departmentService.GetById(id);
-            if (existingDepartment is null)
+            var existingDepartmentDTO = await _departmentService.GetById(id);
+            if (existingDepartmentDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;

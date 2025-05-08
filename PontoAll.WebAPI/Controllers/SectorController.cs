@@ -24,10 +24,10 @@ public class SectorController : Controller
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var sectors = await _sectorService.GetAll();
+        var sectorsDTO = await _sectorService.GetAll();
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = sectors;
+        _response.Data = sectorsDTO;
         _response.Message = "Setores listados com sucesso";
 
         return Ok(_response);
@@ -36,19 +36,19 @@ public class SectorController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var sector = await _sectorService.GetById(id);
+        var sectorDTO = await _sectorService.GetById(id);
 
-        if (sector is null)
+        if (sectorDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = sector;
+            _response.Data = null;
             _response.Message = "Setor não encontrado";
 
             return NotFound(_response);
         }
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = sector;
+        _response.Data = sectorDTO;
         _response.Message = "Setor listado com sucesso";
 
         return Ok(_response);
@@ -60,7 +60,7 @@ public class SectorController : Controller
         if (sectorDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = sectorDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -95,7 +95,7 @@ public class SectorController : Controller
         if (sectorDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = sectorDTO;
+            _response.Data = null;
             _response.Message = "Dados inválidos";
 
             return BadRequest(_response);
@@ -103,8 +103,8 @@ public class SectorController : Controller
 
         try
         {
-            var existingSector = await _sectorService.GetById(id);
-            if (existingSector is null)
+            var existingSectorDTO = await _sectorService.GetById(id);
+            if (existingSectorDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
@@ -138,8 +138,8 @@ public class SectorController : Controller
     {
         try
         {
-            var existingSector = await _sectorService.GetById(id);
-            if (existingSector is null)
+            var existingSectorDTO = await _sectorService.GetById(id);
+            if (existingSectorDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;

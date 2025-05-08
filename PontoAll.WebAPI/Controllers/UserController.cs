@@ -13,341 +13,352 @@ namespace PontoAll.WebAPI.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class UserController : Controller
 {
-    private readonly IUserService _userService;
-    private readonly ITokenService _tokenService;
-    private readonly Response _response;
+    private readonly IUserService _userService;
+    private readonly ITokenService _tokenService;
+    private readonly Response _response;
 
-    public UserController(IUserService userService, ITokenService tokenService)
-    {
-        _userService = userService;
-        _tokenService = tokenService;
-        _response = new Response();
-    }
+    public UserController(IUserService userService, ITokenService tokenService)
+    {
+        _userService = userService;
+        _tokenService = tokenService;
+        _response = new Response();
+    }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var users = await _userService.GetAll();
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var usersDTO = await _userService.GetAll();
 
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = users;
-        _response.Message = "Usuários listados com sucesso";
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = usersDTO;
+        _response.Message = "Usuários listados com sucesso";
 
-        return Ok(_response);
-    }
+        return Ok(_response);
+    }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var user = await _userService.GetById(id);
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var userDTO = await _userService.GetById(id);
 
-        if (user is null)
-        {
-            _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = user;
-            _response.Message = "Usuário não encontrado";
+        if (userDTO is null)
+        {
+            _response.Code = ResponseEnum.NOT_FOUND;
+            _response.Data = null;
+            _response.Message = "Usuário não encontrado";
 
-            return NotFound(_response);
-        }
-
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = user;
-        _response.Message = "Usuário listado com sucesso";
-
-        return Ok(_response);
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Post(UserDTO userDTO)
-    {
-        if (userDTO is null)
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = userDTO;
-            _response.Message = "Dados inválidos";
-
-            return BadRequest(_response);
-        }
-        
-        try
-        {
-            if (!CheckUserInfo(userDTO))
-            {
-                _response.Code = ResponseEnum.INVALID;
-                _response.Data = userDTO;
-                _response.Message = "Formato incorreto de email ou telefone";
-
-                return BadRequest(_response);
-            }
-
-            // Zera o id passado para que o banco decida qual utilizar
-            userDTO.Id = 0;
-
-            var usersDTO = await _userService.GetAll();
-
-            if (CheckDuplicates(usersDTO, userDTO))
-            {
-                _response.Code = ResponseEnum.CONFLICT;
-                _response.Data = userDTO;
-                _response.Message = "Este e-mail já está em uso";
-
-                return BadRequest(_response);
-            }
-
-            userDTO.Password = StringUtils.HashString(userDTO.Password);
-            await _userService.Create(userDTO); 
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Não foi possível cadastrar o usuário";
-            _response.Data = new
-            { 
-                ErrorMessage = ex.Message, 
-                StackTrace = ex.StackTrace ?? "No stack trace available" 
-            };
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
+            return NotFound(_response);
+        }
 
         userDTO.Password = "";
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = userDTO;
-        _response.Message = "Usuário cadastrado com sucesso";
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = userDTO;
+        _response.Message = "Usuário listado com sucesso";
 
-        return Ok(_response);
-    }
+        return Ok(_response);
+    }
 
-    [HttpPost("Login")]
-    [AllowAnonymous]
-    public async Task<ActionResult> Login([FromBody] Login login)
-    {
-        if (login is null)
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = login;
-            _response.Message = "Dados inválidos";
+    [HttpPost]
+    public async Task<IActionResult> Post(UserDTO userDTO)
+    {
+        if (userDTO is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Dados inválidos";
 
-            return BadRequest(_response);
-        }
+            return BadRequest(_response);
+        }
 
-        if (!EmailValidator.IsValidEmail(login.Email))
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = login;
-            _response.Message = "Formato de email incorreto";
+        if (!CheckUserInfo(userDTO))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Formato incorreto de email ou telefone";
 
-            return BadRequest(_response);
-        }
+            return BadRequest(_response);
+        }
 
-        try
-        {
-            login.Password = StringUtils.HashString(login.Password);
-            var userDTO = await _userService.Login(login);
+        // Zera o id passado para que o banco decida qual utilizar
+        userDTO.Id = 0;
 
-            if (userDTO is null)
-            {
-                login.Password = "";
-                _response.Code = ResponseEnum.INVALID;
-                _response.Data = login;
-                _response.Message = "Email ou senha incorretos";
+        var usersDTO = await _userService.GetAll();
 
-                return BadRequest(_response);
-            }
+        if (CheckDuplicates(usersDTO, userDTO))
+        {
+            _response.Code = ResponseEnum.CONFLICT;
+            _response.Data = null;
+            _response.Message = "Este e-mail já está em uso";
 
-            var token = _tokenService.GenerateToken(userDTO);
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = token;
-            _response.Message = "Login realizado com sucesso";
+            return BadRequest(_response);
+        }
 
-            return Ok(_response);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Não foi possível realizar o login";
-            _response.Data = new
-            { 
-                ErrorMessage = ex.Message, 
-                StackTrace = ex.StackTrace ?? "No stack trace available" 
-            };
+        try
+        {
+            userDTO.Password = StringUtils.HashString(userDTO.Password);
+            await _userService.Create(userDTO);
 
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
-    }
+            userDTO.Password = "";
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = userDTO;
+            _response.Message = "Usuário cadastrado com sucesso";
 
-    [HttpPost("Validate")]
-    [AllowAnonymous]
-    public async Task<ActionResult> Validate([FromBody] string token)
-    {
-        if (token is null)
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = token;
-            _response.Message = "Dados inválidos";
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Não foi possível cadastrar o usuário";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
 
-            return BadRequest(_response);
-        }
+    [HttpPost("Login")]
+    [AllowAnonymous]
+    public async Task<ActionResult> Login([FromBody] Login login)
+    {
+        if (login is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Dados inválidos";
 
-        try
-        {
-            var email = _tokenService.ExtractSubjectEmail(token);
+            return BadRequest(_response);
+        }
 
-            if (string.IsNullOrEmpty(email) || await _userService.GetByEmail(email) == null)
-            {
-                _response.Code = ResponseEnum.UNAUTHORIZED;
-                _response.Data = token;
-                _response.Message = "Token inválido";
+        if (!EmailValidator.IsValidEmail(login.Email))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = login;
+            _response.Message = "Formato de email incorreto";
 
-                return Unauthorized(_response);
-            }
-            else if (!await _tokenService.ValidateToken(token))
-            {
-                _response.Code = ResponseEnum.UNAUTHORIZED;
-                _response.Data = token;
-                _response.Message = "Token inválido";
+            return BadRequest(_response);
+        }
 
-                return Unauthorized(_response);
-            }
+        try
+        {
+            login.Password = StringUtils.HashString(login.Password);
+            var userDTO = await _userService.Login(login);
 
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = token;
-            _response.Message = "Token validado com sucesso";
+            if (userDTO is null)
+            {
+                login.Password = "";
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = login;
+                _response.Message = "Email ou senha incorretos";
 
-            return Ok(_response);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Não foi possível validar o token";
-            _response.Data = new
-            { 
-                ErrorMessage = ex.Message, 
-                StackTrace = ex.StackTrace ?? "No stack trace available" 
-            };
+                return BadRequest(_response);
+            }
 
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
-    }
+            var token = _tokenService.GenerateToken(userDTO);
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = token;
+            _response.Message = "Login realizado com sucesso";
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, UserDTO userDTO)
-    {
-        if (userDTO is null)
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = userDTO;
-            _response.Message = "Dados inválidos";
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Não foi possível realizar o login";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
 
-            return BadRequest(_response);
-        }
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
 
-        try
-        {
-            var existingUserDTO = await _userService.GetById(userDTO.Id);
-            if (existingUserDTO is null)
-            {
-                _response.Code = ResponseEnum.NOT_FOUND;
-                _response.Data = existingUserDTO;
-                _response.Message = "O usuário informado não existe";
+    [HttpPost("Validate")]
+    [AllowAnonymous]
+    public async Task<ActionResult> Validate([FromBody] string token)
+    {
+        if (token is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Dados inválidos";
 
-                return NotFound(_response);
-            }
+            return BadRequest(_response);
+        }
 
-            if (!CheckUserInfo(userDTO))
-            {
-                _response.Code = ResponseEnum.INVALID;
-                _response.Data = userDTO;
-                _response.Message = "Formato incorreto de email ou telefone";
+        try
+        {
+            var email = _tokenService.ExtractSubjectEmail(token);
 
-                return BadRequest(_response);
-            }
+            if (string.IsNullOrEmpty(email) || await _userService.GetByEmail(email) == null)
+            {
+                _response.Code = ResponseEnum.UNAUTHORIZED;
+                _response.Data = null;
+                _response.Message = "Token inválido";
 
-            var usersDTO = await _userService.GetAll();
+                return Unauthorized(_response);
+            }
+            else if (!await _tokenService.ValidateToken(token))
+            {
+                _response.Code = ResponseEnum.UNAUTHORIZED;
+                _response.Data = null;
+                _response.Message = "Token inválido";
 
-            if (CheckDuplicates(usersDTO, userDTO))
-            {
-                _response.Code = ResponseEnum.CONFLICT;
-                _response.Data = userDTO;
-                _response.Message = "Este e-mail já está em uso";
+                return Unauthorized(_response);
+            }
 
-                return BadRequest(_response);
-            }
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = token;
+            _response.Message = "Token validado com sucesso";
 
-            await _userService.Update(userDTO, id);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar atualizar os dados do usuário";
-            _response.Data = new
-            { 
-                ErrorMessage = ex.Message, 
-                StackTrace = ex.StackTrace ?? "No stack trace available" 
-            };
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Não foi possível validar o token";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
 
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
 
-        userDTO.Password = "";
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = userDTO;
-        _response.Message = "Usuário atualizado com sucesso";
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, UserDTO userDTO)
+    {
+        if (userDTO is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Dados inválidos";
 
-        return Ok(_response);
-    }
+            return BadRequest(_response);
+        }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
-        {
-            await _userService.Remove(id);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar remover um usuário";
-            _response.Data = new
-            { 
-                ErrorMessage = ex.Message, 
-                StackTrace = ex.StackTrace ?? "No stack trace available" 
-            };
+        try
+        {
+            var existingUserDTO = await _userService.GetById(id);
+            if (existingUserDTO is null)
+            {
+                _response.Code = ResponseEnum.NOT_FOUND;
+                _response.Data = null;
+                _response.Message = "O usuário informado não existe";
 
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
+                return NotFound(_response);
+            }
 
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = null;
-        _response.Message = "Usuário removido com sucesso";
+            if (!CheckUserInfo(userDTO))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "Formato incorreto de email ou telefone";
 
-        return Ok(_response);
-    }
+                return BadRequest(_response);
+            }
 
-    private static bool CheckUserInfo(UserDTO userDTO)
-    {
-        bool isValidPhone = PhoneValidator.IsValidPhone(userDTO.Phone);
-        bool isValidEmail = EmailValidator.IsValidEmail(userDTO.Email);
-        bool isValidRecoveryEmail = EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
+            var usersDTO = await _userService.GetAll();
 
-        return isValidPhone && isValidEmail && isValidRecoveryEmail;
-    }
+            if (CheckDuplicates(usersDTO, userDTO))
+            {
+                userDTO.Password = "";
+                _response.Code = ResponseEnum.CONFLICT;
+                _response.Data = userDTO;
+                _response.Message = "Este e-mail já está em uso";
 
-    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
-	{
-        foreach (var user in usersDTO)
-        {
-            if (userDTO.Id == user.Id)
-		    {
-			    continue;
-		    }
+                return BadRequest(_response);
+            }
 
-		    if (StringUtils.CompareString(userDTO.Email, user.Email))
-            {
-                return true;
-            }
-        }
+            await _userService.Update(userDTO, id);
 
-        return false;
-    }
+            userDTO.Password = "";
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = userDTO;
+            _response.Message = "Usuário atualizado com sucesso";
+
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Ocorreu um erro ao tentar atualizar os dados do usuário";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            var existingUserDTO = await _userService.GetById(id);
+            if (existingUserDTO is null)
+            {
+                _response.Code = ResponseEnum.NOT_FOUND;
+                _response.Data = null;
+                _response.Message = "O usuário informado não existe";
+
+                return NotFound(_response);
+            }
+
+            await _userService.Remove(id);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = null;
+            _response.Message = "Usuário removido com sucesso";
+
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Ocorreu um erro ao tentar remover o usuário";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
+
+    private static bool CheckUserInfo(UserDTO userDTO)
+    {
+        bool isValidPhone = PhoneValidator.IsValidPhone(userDTO.Phone);
+        bool isValidEmail = EmailValidator.IsValidEmail(userDTO.Email);
+        bool isValidRecoveryEmail = EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
+
+        return isValidPhone && isValidEmail && isValidRecoveryEmail;
+    }
+
+    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
+    {
+        foreach (var user in usersDTO)
+        {
+            if (userDTO.Id == user.Id)
+            {
+                continue;
+            }
+
+            if (StringUtils.CompareString(userDTO.Email, user.Email))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
-
