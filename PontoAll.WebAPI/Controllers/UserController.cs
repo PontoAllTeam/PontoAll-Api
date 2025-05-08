@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
-using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Objects.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using PontoAll.WebAPI.Services.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 

@@ -1,4 +1,4 @@
-namespace PontoAll.WebAPI.Objects.Utils;
+namespace PontoAll.WebAPI.Services.Utils;
 
 public class EmailValidator
 {
