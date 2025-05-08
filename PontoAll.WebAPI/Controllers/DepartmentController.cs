@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
+using PontoAll.WebAPI.Objects.Contracts;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -11,69 +12,159 @@ namespace PontoAll.WebAPI.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class DepartmentController : Controller
 {
-    private readonly IDepartmentService _departmentService;
+    private readonly IDepartmentService _departmentService;
+    private readonly Response _response;
 
-    public DepartmentController(IDepartmentService departmentService)
-    {
-        this._departmentService = departmentService;
-    }
+    public DepartmentController(IDepartmentService departmentService)
+    {
+        _departmentService = departmentService;
+        _response = new Response();
+    }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var departments = await _departmentService.GetAll();
-        return Ok(departments);
-    }
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var departments = await _departmentService.GetAll();
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var departments = await _departmentService.GetById(id);
-        if (departments == null)
-            return NotFound("Departamento não encontrado");
-        return Ok(departments);
-    }
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = departments;
+        _response.Message = "Departamentos listados com sucesso";
 
-    [HttpPost]
-    public async Task<IActionResult> Post(DepartmentDTO departmentDTO)
-    {
-        try
-        {
-            await _departmentService.Create(departmentDTO);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, "Ocorreu um erro ao tentar inserir um novo departamento");
-        }
-        return Ok(departmentDTO);
-    }
+        return Ok(_response);
+    }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, DepartmentDTO departmentDTO)
-    {
-        try
-        {
-            await _departmentService.Update(departmentDTO, id);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, "Ocorreu um erro ao tentar atualizar os dados do departamento" + ex.Message);
-        }
-        return Ok(departmentDTO);
-    }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var department = await _departmentService.GetById(id);
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
-        {
-            await _departmentService.Remove(id);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, "Ocorreu um erro ao tentar remover um departamento.");
-        }
-        return Ok("Departamento removido com sucesso");
-    }
+        if (department is null)
+        {
+            _response.Code = ResponseEnum.NOT_FOUND;
+            _response.Data = department;
+            _response.Message = "Departamento não encontrado";
+
+            return NotFound(_response);
+        }
+
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = department;
+        _response.Message = "Departamento listado com sucesso";
+
+        return Ok(_response);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post(DepartmentDTO departmentDTO)
+    {
+        if (departmentDTO is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = departmentDTO;
+            _response.Message = "Dados inválidos";
+
+            return BadRequest(_response);
+        }
+
+        try
+        {
+            await _departmentService.Create(departmentDTO);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = departmentDTO;
+            _response.Message = "Departamento cadastrado com sucesso";
+
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Não foi possível cadastrar o departamento";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, DepartmentDTO departmentDTO)
+    {
+        if (departmentDTO is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = departmentDTO;
+            _response.Message = "Dados inválidos";
+
+            return BadRequest(_response);
+        }
+
+        try
+        {
+            var existingDepartment = await _departmentService.GetById(id);
+            if (existingDepartment is null)
+            {
+                _response.Code = ResponseEnum.NOT_FOUND;
+                _response.Data = null;
+                _response.Message = "O departamento informado não existe";
+                return NotFound(_response);
+            }
+
+            await _departmentService.Update(departmentDTO, id);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = departmentDTO;
+            _response.Message = "Departamento atualizado com sucesso";
+
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Ocorreu um erro ao tentar atualizar os dados do departamento";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            var existingDepartment = await _departmentService.GetById(id);
+            if (existingDepartment is null)
+            {
+                _response.Code = ResponseEnum.NOT_FOUND;
+                _response.Data = null;
+                _response.Message = "O departamento informado não existe";
+                return NotFound(_response);
+            }
+
+            await _departmentService.Remove(id);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = null;
+            _response.Message = "Departamento removido com sucesso";
+
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Ocorreu um erro ao tentar remover o departamento";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
 }
-
