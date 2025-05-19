@@ -2,9 +2,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PontoAll.WebAPI.Data;
 using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Data.Repositories;
+using PontoAll.WebAPI.Data;
+using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using System.Text;
@@ -25,7 +26,11 @@ else
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new NullableTimeOnlyJsonConverter());
+    });
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

@@ -1,21 +1,27 @@
-namespace PontoAll.WebAPI.Objects.Utils;
+using PontoAll.WebAPI.Objects.Dtos.Entities;
 
-public class EmailValidator
+namespace PontoAll.WebAPI.Objects.Utils
 {
-    public static bool IsValidEmail(string email)
+    public static class EmailValidator
     {
-        int atPosition = email.IndexOf('@');
+        public static bool IsValidEmail(string email)
+        {
+            if(string.IsNullOrWhiteSpace(email)) { return false; }
 
-        bool hasTextBeforeAt = atPosition > 0;
-        bool hasTextAfterAt = atPosition >= 0 && email.LastIndexOf('@') < email.Length - 1;
-        bool hasDotAfterAt = atPosition >= 0 && email.LastIndexOf('.') > atPosition;
-        bool endsWithDot = email.EndsWith('.');
-        bool hasSingleAt = email.Count(c => c == '@') == 1;
+            int atPosition = email.IndexOf('@');
 
-        return hasSingleAt &&
-               hasTextBeforeAt &&
-               hasTextAfterAt &&
-               hasDotAfterAt &&
-               !endsWithDot;
+
+            bool hasTextBeforeAt = atPosition > 0;
+            bool hasTextAfterAt = atPosition >= 0 && email.LastIndexOf('@') < email.Length - 1;
+            bool hasDotAfterAt = atPosition >= 0 && email.LastIndexOf('.') > atPosition;
+            bool endsWithDot = email.EndsWith('.');
+            bool hasSingleAt = email.Count(c => c == '@') == 1;
+
+            return hasSingleAt &&
+                   hasTextBeforeAt &&
+                   hasTextAfterAt &&
+                   hasDotAfterAt &&
+                   !endsWithDot;
+        }
     }
 }

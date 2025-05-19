@@ -335,16 +335,14 @@ public class UserController : Controller
         }
     }
 
-    private static bool CheckUserInfo(UserDTO userDTO)
-    {
-        bool isValidPhone = PhoneValidator.IsValidPhone(userDTO.Phone);
-        bool isValidEmail = EmailValidator.IsValidEmail(userDTO.Email);
-        bool isValidRecoveryEmail = EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
+    private static bool CheckUserInfo(UserDTO userDTO)
+    {
+        return PhoneValidator.IsValidPhone(userDTO.Phone)
+            && EmailValidator.IsValidEmail(userDTO.Email)
+            && EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
+    }
 
-        return isValidPhone && isValidEmail && isValidRecoveryEmail;
-    }
-
-    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
+    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
     {
         foreach (var user in usersDTO)
         {
