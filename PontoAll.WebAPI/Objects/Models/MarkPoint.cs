@@ -18,23 +18,18 @@ public class MarkPoint
     [Column("location")]
     public Geolocation Location { get; set; }
 
-    [Column("photo")]
-    public string Photo {  get; set; }
-
     [Column("userid")]
     public int UserId { get; set; }
     public User User { get; set; } = null!;
 
     public MarkPoint() { }
 
-    public MarkPoint(int id, DateOnly date, TimeOnly time, Geolocation location, string photo, int userId)
+    public MarkPoint(int id, DateOnly date, TimeOnly time, Geolocation location, int userId)
     {
         Id = id;
         Date = date;
         Time = time;
         Location = location;
-        Photo = photo;
         UserId = userId;
     }
-
 }
