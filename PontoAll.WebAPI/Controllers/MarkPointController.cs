@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
+using PontoAll.WebAPI.Services.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -64,6 +65,15 @@ public class MarkPointController : Controller
             return BadRequest(_response);
         }
 
+        if (!GeolocationValidator.IsValidGeolocation(markPointDTO.Location))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Formato das coordenadas de geolocalização incorreto";
+
+            return BadRequest(_response);
+        }
+
         try
         {
             await _markPointService.Create(markPointDTO);
@@ -98,6 +108,15 @@ public class MarkPointController : Controller
 
             return BadRequest(_response);
         }
+
+        if (!GeolocationValidator.IsValidGeolocation(markPointDTO.Location))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Formato das coordenadas de geolocalização incorreto";
+
+            return BadRequest(_response);
+        }
 
         try
         {
