@@ -1,63 +1,62 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
-using PontoAll.WebAPI.Objects.Contracts;
+using PontoAll.WebAPI.Services.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class DepartmentController : Controller
+public class MarkPointController : Controller
 {
-    private readonly IDepartmentService _departmentService;
+    private readonly IMarkPointService _markPointService;
     private readonly Response _response;
 
-    public DepartmentController(IDepartmentService departmentService)
+    public MarkPointController(IMarkPointService markPointService)
     {
-        _departmentService = departmentService;
+        _markPointService = markPointService;
         _response = new Response();
-    }
-
-    [HttpGet]
+    }
+    [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var departmentsDTO = await _departmentService.GetAll();
+        var markPointsDTO = await _markPointService.GetAll();
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = departmentsDTO;
-        _response.Message = "Departamentos listados com sucesso";
+        _response.Data = markPointsDTO;
+        _response.Message = "Marcações de ponto listadas com sucesso";
 
         return Ok(_response);
     }
-
-    [HttpGet("{id}")]
+    [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var departmentDTO = await _departmentService.GetById(id);
+        var markPointDTO = await _markPointService.GetById(id);
 
-        if (departmentDTO is null)
+        if (markPointDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
             _response.Data = null;
-            _response.Message = "Departamento não encontrado";
+            _response.Message = "Marcação de ponto não encontrada";
 
             return NotFound(_response);
         }
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = departmentDTO;
-        _response.Message = "Departamento listado com sucesso";
+        _response.Data = markPointDTO;
+        _response.Message = "Marcação de ponto listada com sucesso";
 
         return Ok(_response);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(DepartmentDTO departmentDTO)
+    public async Task<IActionResult> Post(MarkPointDTO markPointDTO)
     {
-        if (departmentDTO is null)
+        if (markPointDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
@@ -66,20 +65,29 @@ public class DepartmentController : Controller
             return BadRequest(_response);
         }
 
+        if (!GeolocationValidator.IsValidGeolocation(markPointDTO.Location))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Formato das coordenadas de geolocalização incorreto";
+
+            return BadRequest(_response);
+        }
+
         try
         {
-            await _departmentService.Create(departmentDTO);
+            await _markPointService.Create(markPointDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = departmentDTO;
-            _response.Message = "Departamento cadastrado com sucesso";
+            _response.Data = markPointDTO;
+            _response.Message = "Marcação de ponto cadastrada com sucesso";
 
             return Ok(_response);
         }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Não foi possível cadastrar o departamento";
+            _response.Message = "Não foi possível cadastrar a marcação de ponto";
             _response.Data = new
             {
                 ErrorMessage = ex.Message,
@@ -90,9 +98,9 @@ public class DepartmentController : Controller
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, DepartmentDTO departmentDTO)
+    public async Task<IActionResult> Put(int id, MarkPointDTO markPointDTO)
     {
-        if (departmentDTO is null)
+        if (markPointDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
@@ -101,29 +109,38 @@ public class DepartmentController : Controller
             return BadRequest(_response);
         }
 
-        try
+        if (!GeolocationValidator.IsValidGeolocation(markPointDTO.Location))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Formato das coordenadas de geolocalização incorreto";
+
+            return BadRequest(_response);
+        }
+
+        try
         {
-            var existingDepartmentDTO = await _departmentService.GetById(id);
-            if (existingDepartmentDTO is null)
+            var existingMarkPointDTO = await _markPointService.GetById(id);
+            if (existingMarkPointDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
-                _response.Message = "O departamento informado não existe";
+                _response.Message = "A marcação de ponto informada não existe";
                 return NotFound(_response);
             }
 
-            await _departmentService.Update(departmentDTO, id);
+            await _markPointService.Update(markPointDTO, id);
 
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = departmentDTO;
-            _response.Message = "Departamento atualizado com sucesso";
+            _response.Data = markPointDTO;
+            _response.Message = "Marcação de ponto atualizada com sucesso";
 
             return Ok(_response);
         }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar atualizar os dados do departamento";
+            _response.Message = "Ocorreu um erro ao tentar atualizar a marcação de ponto";
             _response.Data = new
             {
                 ErrorMessage = ex.Message,
@@ -135,30 +152,30 @@ public class DepartmentController : Controller
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
-    {
-        try
+    {
+        try
         {
-            var existingDepartmentDTO = await _departmentService.GetById(id);
-            if (existingDepartmentDTO is null)
+            var existingMarkPointDTO = await _markPointService.GetById(id);
+            if (existingMarkPointDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
-                _response.Message = "O departamento informado não existe";
+                _response.Message = "A marcação de ponto informada não existe";
                 return NotFound(_response);
             }
 
-            await _departmentService.Remove(id);
+            await _markPointService.Remove(id);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = null;
-            _response.Message = "Departamento removido com sucesso";
+            _response.Message = "Marcação de ponto removida com sucesso";
 
             return Ok(_response);
         }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar remover o departamento";
+            _response.Message = "Ocorreu um erro ao tentar remover a marcação de ponto";
             _response.Data = new
             {
                 ErrorMessage = ex.Message,
