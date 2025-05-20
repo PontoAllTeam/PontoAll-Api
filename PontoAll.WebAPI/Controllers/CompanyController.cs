@@ -5,6 +5,7 @@ using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Services.Utils;
+using PontoAll.WebAPI.Objects.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -92,7 +93,7 @@ public class CompanyController : Controller
             _response.Message = ex.Message;
             _response.Data = null;
 
-            return BadRequest(_response); // retorna 400
+            return BadRequest(_response);
         }
         catch (Exception ex)
         {
@@ -104,7 +105,7 @@ public class CompanyController : Controller
                 StackTrace = ex.StackTrace ?? "No stack trace available"
             };
 
-            return StatusCode(StatusCodes.Status500InternalServerError, _response); // 500 apenas para falhas inesperadas
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
         }
 
     }
