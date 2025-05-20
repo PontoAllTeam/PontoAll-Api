@@ -75,10 +75,10 @@ public class ScaleController : Controller
                 _response.Code = ResponseEnum.INVALID;
                 _response.Data = null;
                 _response.Message = "ID já cadastrado.";
-                return BadRequest(_response); // Retorna erro 400 se o ID já existir
+                return BadRequest(_response);
             }
 
-            ScaleValidator.Validate(scaleDTO); // Validação dos dados da escala
+            ScaleValidator.Validate(scaleDTO);
 
             await _scaleService.Create(scaleDTO);
 
@@ -123,7 +123,6 @@ public class ScaleController : Controller
                 return NotFound(_response);
             }
 
-            // Verifica se o ID da escala a ser atualizado já existe (não deve existir em outro lugar no banco)
             if (id != scaleDTO.Id)
             {
                 var existingScaleById = await _scaleService.GetById(scaleDTO.Id);
@@ -132,11 +131,11 @@ public class ScaleController : Controller
                     _response.Code = ResponseEnum.INVALID;
                     _response.Data = null;
                     _response.Message = "ID já cadastrado.";
-                    return BadRequest(_response); // Retorna erro 400 se o ID já existir em outro registro
+                    return BadRequest(_response); 
                 }
             }
 
-            ScaleValidator.Validate(scaleDTO); // Validação dos dados da escala
+            ScaleValidator.Validate(scaleDTO);
 
             await _scaleService.Update(scaleDTO, id);
 
