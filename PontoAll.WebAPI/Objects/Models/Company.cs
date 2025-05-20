@@ -46,6 +46,7 @@ public class Company
     public CompanyStatus Status { get; set; }
 
     public ICollection<User> Users { get; } = [];
+    public ICollection<Geofence> Geofences { get; } = [];
 
     public Company()
     {
