@@ -66,6 +66,8 @@ builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ISectorRepository, SectorRepository>();
 builder.Services.AddScoped<IMarkPointRepository, MarkPointRepository>();
+builder.Services.AddScoped<IGeofenceRepository, GeofenceRepository>();
+builder.Services.AddScoped<IGeofencePointRepository, GeofencePointRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
