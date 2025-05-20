@@ -13,5 +13,6 @@ public class MappingProfile : Profile
         CreateMap<UserDTO, User>().ReverseMap();
         CreateMap<DepartmentDTO, Department>().ReverseMap();
         CreateMap<SectorDTO, Sector>().ReverseMap();
+        CreateMap<MarkPointDTO, MarkPoint>().ReverseMap();
     }
 }

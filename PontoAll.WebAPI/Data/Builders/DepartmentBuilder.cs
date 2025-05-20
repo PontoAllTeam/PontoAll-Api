@@ -4,7 +4,7 @@ using PontoAll.WebAPI.Objects.Models;
 namespace PontoAll.WebAPI.Data.Builders;
 public class DepartmentBuilder
 {
-    public static void Builder(ModelBuilder modelBuilder)
+    public static void Build(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Department>().HasKey(s => s.Id);
         modelBuilder.Entity<Department>().Property(s => s.Name).IsRequired().HasMaxLength(100);

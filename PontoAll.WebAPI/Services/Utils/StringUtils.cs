@@ -2,7 +2,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PontoAll.WebAPI.Objects.Utils;
+namespace PontoAll.WebAPI.Services.Utils;
 
 public static class StringUtils
 {
@@ -35,9 +35,9 @@ public static class StringUtils
     }
 
     public static bool CompareString(string str1, string str2)
-	{
-		return string.Equals(str1.NormalizeText(), str2.NormalizeText(), StringComparison.OrdinalIgnoreCase);
-	}
+    {
+        return string.Equals(str1.NormalizeText(), str2.NormalizeText(), StringComparison.OrdinalIgnoreCase);
+    }
 
     public static string HashString(this string text)
     {

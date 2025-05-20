@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Company> Companies { get; set; }
     public DbSet<Department> Departments { get; set; }
     public DbSet<Sector> Sectors { get; set; }
+    public DbSet<MarkPoint> MarkPoints { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -21,7 +22,8 @@ public class AppDbContext : DbContext
         ScaleBuilder.Build(modelBuilder);
         CompanyBuilder.Build(modelBuilder);
         UserBuilder.Build(modelBuilder);
-        DepartmentBuilder.Builder(modelBuilder);
-        SectorBuilder.Builder(modelBuilder);
+        DepartmentBuilder.Build(modelBuilder);
+        SectorBuilder.Build(modelBuilder);
+        MarkPointBuilder.Build(modelBuilder);
     }
 }
