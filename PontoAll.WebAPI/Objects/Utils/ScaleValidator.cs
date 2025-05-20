@@ -1,5 +1,6 @@
 ﻿using PontoAll.WebAPI.Objects.Dtos.Entities;
 using System.Globalization;
+using System.Linq;
 
 namespace PontoAll.WebAPI.Objects.Utils
 {
@@ -13,8 +14,10 @@ namespace PontoAll.WebAPI.Objects.Utils
             if (!IsValidMonth(scale.YearMonth))
                 throw new Exception("Ano/mês inválido.");
 
-            // Verifica se a data construída com Day e YearMonth é válida
-            string fullDate = $"{scale.YearMonth}-{scale.Day:D2}";
+            // Ajusta o separador para hífen para garantir o parse da data completa
+            string yearMonthNormalized = scale.YearMonth.Replace('/', '-');
+            string fullDate = $"{yearMonthNormalized}-{scale.Day:D2}";
+
             if (!DateTime.TryParseExact(fullDate, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime parsedDate))
                 throw new Exception("Data completa inválida.");
 
@@ -25,6 +28,7 @@ namespace PontoAll.WebAPI.Objects.Utils
             string diaSemana = CultureInfo.GetCultureInfo("pt-BR").DateTimeFormat.GetDayName(parsedDate.DayOfWeek);
             string nomeMes = CultureInfo.GetCultureInfo("pt-BR").DateTimeFormat.GetMonthName(parsedDate.Month);
 
+            // Console.WriteLine pode ser removido ou mantido para debug
             Console.WriteLine($"Dia da semana: {diaSemana}, Mês: {nomeMes}");
 
             var pickProperties = typeof(ScaleDTO).GetProperties()
@@ -35,15 +39,16 @@ namespace PontoAll.WebAPI.Objects.Utils
             TimeOnly? previous = null;
             foreach (var prop in pickProperties)
             {
-                var current = (TimeOnly?)prop.GetValue(scale);
+                var value = prop.GetValue(scale) as string;
 
-                if (current.HasValue)
+                if (!string.IsNullOrWhiteSpace(value))
                 {
-                    // Validação de faixa de horário: entre 00:00:00 e 23:59:59
-                    if (current.Value < TimeOnly.MinValue || current.Value > new TimeOnly(23, 59, 59))
-                        throw new Exception($"{prop.Name} contém horário inválido. Use valores entre 00:00:00 e 23:59:59.");
+                    if (!TimeOnly.TryParse(value, out var current))
+                        throw new Exception($"{prop.Name} contém um horário inválido. Use o formato HH:mm:ss.");
 
-                    // Verificação se o horário está em ordem crescente
+                    if (current < TimeOnly.MinValue || current > new TimeOnly(23, 59, 59))
+                        throw new Exception($"{prop.Name} contém horário fora do intervalo permitido.");
+
                     if (previous.HasValue && current < previous)
                         throw new Exception($"{prop.Name} deve ser maior que o horário anterior.");
 
@@ -53,7 +58,8 @@ namespace PontoAll.WebAPI.Objects.Utils
         }
         private static bool IsValidMonth(string yearMonth)
         {
-            return DateTime.TryParseExact(yearMonth, "yyyy-MM", CultureInfo.InvariantCulture,
+            string[] formats = { "yyyy-MM", "yyyy/MM" };
+            return DateTime.TryParseExact(yearMonth, formats, CultureInfo.InvariantCulture,
                 DateTimeStyles.None, out _);
         }
     }
