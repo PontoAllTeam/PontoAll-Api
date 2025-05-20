@@ -5,6 +5,7 @@ using PontoAll.WebAPI.Objects.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using PontoAll.WebAPI.Services.Utils;
+using PontoAll.WebAPI.Objects.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -79,7 +80,6 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
-        // Zera o id passado para que o banco decida qual utilizar
         userDTO.Id = 0;
 
         var usersDTO = await _userService.GetAll();
