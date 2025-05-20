@@ -14,5 +14,7 @@ public class MappingProfile : Profile
         CreateMap<DepartmentDTO, Department>().ReverseMap();
         CreateMap<SectorDTO, Sector>().ReverseMap();
         CreateMap<MarkPointDTO, MarkPoint>().ReverseMap();
+        CreateMap<GeofenceDTO, Geofence>().ReverseMap();
+        CreateMap<GeofencePointDTO, GeofencePoint>().ReverseMap();
     }
 }
