@@ -2,7 +2,7 @@ using PontoAll.WebAPI.Objects.Contracts;
 
 namespace PontoAll.WebAPI.Objects.Dtos.Entities;
 
-public class GeofencePoint
+public class GeofencePointDTO
 {
     public int Id { get; set; }
     public Geolocation Location { get; set; }
