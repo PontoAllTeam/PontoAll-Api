@@ -58,6 +58,8 @@ builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ISectorService, SectorService>();
 builder.Services.AddScoped<IMarkPointService, MarkPointService>();
+builder.Services.AddScoped<IGeofenceService, GeofenceService>();
+builder.Services.AddScoped<IGeofencePointService, GeofencePointService>();
 
 //Scoped Repositories and Interfaces
 builder.Services.AddScoped<IScaleRepository, ScaleRepository>();
