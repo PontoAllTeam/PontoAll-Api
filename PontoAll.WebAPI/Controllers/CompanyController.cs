@@ -2,9 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
+using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Interfaces;
-using PontoAll.WebAPI.Objects.Contracts;
-using PontoAll.WebAPI.Services.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -13,185 +12,87 @@ namespace PontoAll.WebAPI.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class CompanyController : Controller
 {
-    private readonly ICompanyService _companyService;
-    private readonly Response _response;
 
-    public CompanyController(ICompanyService companyService)
-    {
-        _companyService = companyService;
-        _response = new Response();
-    }
+    private readonly ICompanyService _companyService;
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var companiesDTO = await _companyService.GetAll();
+    public CompanyController(ICompanyService companyService)
+    {
+        this._companyService = companyService;
+    }
 
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = companiesDTO;
-        _response.Message = "Empresas listadas com sucesso";
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var companies = await _companyService.GetAll();
+        return Ok(companies);
+    }
 
-        return Ok(_response);
-    }
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var companies = await _companyService.GetById(id);
+        if (companies == null)
+            return NotFound("Empresa não encontrada");
+        return Ok(companies);
+    }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var companyDTO = await _companyService.GetById(id);
+    [HttpPost]
+    public async Task<IActionResult> Post(CompanyDTO companyDTO)
+    {
+        if (!CheckCompanyInfo(companyDTO))
+        {
+            return BadRequest("Formato incorreto de email ou telefone");
+        }
 
-        if (companyDTO is null)
-        {
-            _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = null;
-            _response.Message = "Empresa não encontrada";
+        try
+        {
+            await _companyService.Create(companyDTO);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Ocorreu um erro ao tentar inserir uma nova empresa");
+        }
+        return Ok(companyDTO);
+    }
 
-            return NotFound(_response);
-        }
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Put(int id, CompanyDTO companyDTO)
+    {
+        if (!CheckCompanyInfo(companyDTO))
+        {
+            return BadRequest("Formato incorreto de email ou telefone");
+        }
 
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = companyDTO;
-        _response.Message = "Empresa listada com sucesso";
+        try
+        {
+            await _companyService.Update(companyDTO, id);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Ocorreu um erro ao tentar atualizar os dados da empresa" + ex.Message);
+        }
+        return Ok(companyDTO);
+    }
 
-        return Ok(_response);
-    }
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            await _companyService.Remove(id);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, "Ocorreu um erro ao tentar remover uma empresa.");
+        }
+        return Ok("Empresa removida com sucesso");
+    }
 
-    [HttpPost]
-    public async Task<IActionResult> Post(CompanyDTO companyDTO)
-    {
-        if (companyDTO is null)
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = null;
-            _response.Message = "Dados inválidos";
+    private static bool CheckCompanyInfo(CompanyDTO companyDTO)
+    {
+        bool isValidPhone = PhoneValidator.IsValidPhone(companyDTO.BusinessPhone);
+        bool isValidEmail = EmailValidator.IsValidEmail(companyDTO.Email);
 
-            return BadRequest(_response);
-        }
-
-        if (!CheckCompanyInfo(companyDTO))
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = companyDTO;
-            _response.Message = "Formato incorreto de email ou telefone";
-
-            return BadRequest(_response);
-        }
-
-        try
-        {
-            await _companyService.Create(companyDTO);
-
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = companyDTO;
-            _response.Message = "Empresa cadastrada com sucesso";
-
-            return Ok(_response);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Não foi possível cadastrar a empresa";
-            _response.Data = new
-            {
-                ErrorMessage = ex.Message,
-                StackTrace = ex.StackTrace ?? "No stack trace available"
-            };
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, CompanyDTO companyDTO)
-    {
-        if (companyDTO is null)
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = null;
-            _response.Message = "Dados inválidos";
-
-            return BadRequest(_response);
-        }
-
-        if (!CheckCompanyInfo(companyDTO))
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Data = companyDTO;
-            _response.Message = "Formato incorreto de email ou telefone";
-
-            return BadRequest(_response);
-        }
-
-        try
-        {
-            var existingCompanyDTO = await _companyService.GetById(id);
-            if (existingCompanyDTO is null)
-            {
-                _response.Code = ResponseEnum.NOT_FOUND;
-                _response.Data = null;
-                _response.Message = "A empresa informada não existe";
-                return NotFound(_response);
-            }
-
-            await _companyService.Update(companyDTO, id);
-
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = companyDTO;
-            _response.Message = "Empresa atualizada com sucesso";
-
-            return Ok(_response);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar atualizar os dados da empresa";
-            _response.Data = new
-            {
-                ErrorMessage = ex.Message,
-                StackTrace = ex.StackTrace ?? "No stack trace available"
-            };
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
-        {
-            var existingCompanyDTO = await _companyService.GetById(id);
-            if (existingCompanyDTO is null)
-            {
-                _response.Code = ResponseEnum.NOT_FOUND;
-                _response.Data = null;
-                _response.Message = "A empresa informada não existe";
-                return NotFound(_response);
-            }
-
-            await _companyService.Remove(id);
-
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = null;
-            _response.Message = "Empresa removida com sucesso";
-
-            return Ok(_response);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar remover a empresa";
-            _response.Data = new
-            {
-                ErrorMessage = ex.Message,
-                StackTrace = ex.StackTrace ?? "No stack trace available"
-            };
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
-    }
-
-    private static bool CheckCompanyInfo(CompanyDTO companyDTO)
-    {
-        bool isValidPhone = PhoneValidator.IsValidPhone(companyDTO.BusinessPhone);
-        bool isValidEmail = EmailValidator.IsValidEmail(companyDTO.Email);
-
-        return isValidPhone && isValidEmail;
-    }
+        return isValidPhone && isValidEmail;
+    }
 }
