@@ -1,4 +1,5 @@
 ﻿using PontoAll.WebAPI.Objects.Dtos.Entities;
+using PontoAll.WebAPI.Services.Utils;
 using System.Text.RegularExpressions;
 
 namespace PontoAll.WebAPI.Objects.Utils
@@ -10,7 +11,6 @@ namespace PontoAll.WebAPI.Objects.Utils
             if (string.IsNullOrWhiteSpace(user.Name))
                 throw new Exception("Nome é obrigatório.");
 
-            // Limpeza de caracteres especiais no CPF e no Telefone
             user.Cpf = StringUtils.ExtractNumbers(user.Cpf);
             user.Phone = StringUtils.ExtractNumbers(user.Phone);
 
