@@ -10,35 +10,35 @@ namespace PontoAll.WebAPI.Objects.Dtos.Entities
         public string YearMonth { get; set; }
         public int DayType { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick1 { get; set; }
+        [HoraValida]
+        public string? Pick1 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick2 { get; set; }
+        [HoraValida]
+        public string? Pick2 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick3 { get; set; }
+        [HoraValida]
+        public string? Pick3 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick4 { get; set; }
+        [HoraValida]
+        public string? Pick4 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick5 { get; set; }
+        [HoraValida]
+        public string? Pick5 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick6 { get; set; }
+        [HoraValida]
+        public string? Pick6 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick7 { get; set; }
+        [HoraValida]
+        public string? Pick7 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick8 { get; set; }
+        [HoraValida]
+        public string? Pick8 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick9 { get; set; }
+        [HoraValida]
+        public string? Pick9 { get; set; }
 
-        [JsonConverter(typeof(NullableTimeOnlyJsonConverter))]
-        public TimeOnly? Pick10 { get; set; }
+        [HoraValida]
+        public string? Pick10 { get; set; }
 
         public int UserId { get; set; }
     }
