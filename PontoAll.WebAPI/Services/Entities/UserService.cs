@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using PontoAll.WebAPI.Data.Interfaces;
+using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Objects.Models;
-using PontoAll.WebAPI.Objects.Contracts;
+using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Services.Entities;
@@ -20,17 +21,29 @@ public class UserService : GenericService<User, UserDTO>, IUserService
 
     public async Task<UserDTO> GetByEmail(string email)
     {
-        var userModel = await _userRepository.GetByEmail(email);
-
-        if (userModel != null) userModel.Password = "";
-        return _mapper.Map<UserDTO>(userModel);
+        var user = await _userRepository.GetByEmail(email);
+        return _mapper.Map<UserDTO>(user);
     }
 
-    public async Task<UserDTO> Login(Login login)
+    public async Task<UserDTO?> Login(Login login)
     {
-        var userModel = await _userRepository.Login(login);
+        var user = await _userRepository.GetByEmail(login.Email);
+        if (user == null || user.Password != login.Password)
+        {
+            return null;
+        }
+        return _mapper.Map<UserDTO>(user);
+    }
 
-        if (userModel is not null) userModel.Password = "";
-        return _mapper.Map<UserDTO>(userModel);
+    public async Task Create(UserDTO dto)
+    {
+        UserValidator.Validate(dto);
+        await base.Create(dto);
+    }
+
+    public async Task Update(UserDTO dto, int id)
+    {
+        UserValidator.Validate(dto);
+        await base.Update(dto, id);
     }
 }

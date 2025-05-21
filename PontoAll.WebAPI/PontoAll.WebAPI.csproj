@@ -19,9 +19,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.0.0" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Objects\Dtos\Mappings\" />
-  </ItemGroup>
-
+	<ItemGroup>
+		<Folder Include="Objects\Dtos\Mappings\" />
+	</ItemGroup>
 </Project>

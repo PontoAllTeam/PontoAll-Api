@@ -5,6 +5,7 @@ using PontoAll.WebAPI.Objects.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using PontoAll.WebAPI.Services.Utils;
+using PontoAll.WebAPI.Objects.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -79,7 +80,6 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
-        // Zera o id passado para que o banco decida qual utilizar
         userDTO.Id = 0;
 
         var usersDTO = await _userService.GetAll();
@@ -335,16 +335,14 @@ public class UserController : Controller
         }
     }
 
-    private static bool CheckUserInfo(UserDTO userDTO)
-    {
-        bool isValidPhone = PhoneValidator.IsValidPhone(userDTO.Phone);
-        bool isValidEmail = EmailValidator.IsValidEmail(userDTO.Email);
-        bool isValidRecoveryEmail = EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
+    private static bool CheckUserInfo(UserDTO userDTO)
+    {
+        return PhoneValidator.IsValidPhone(userDTO.Phone)
+            && EmailValidator.IsValidEmail(userDTO.Email)
+            && EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
+    }
 
-        return isValidPhone && isValidEmail && isValidRecoveryEmail;
-    }
-
-    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
+    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
     {
         foreach (var user in usersDTO)
         {

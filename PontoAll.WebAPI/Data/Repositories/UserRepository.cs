@@ -23,4 +23,8 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
         return await _context.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == login.Email && u.Password == login.Password);
     }
+    public async Task<User> GetByCPF(string cpf)
+    {
+        return await _context.Users.FirstOrDefaultAsync(u => u.Cpf == cpf);
+    }
 }
