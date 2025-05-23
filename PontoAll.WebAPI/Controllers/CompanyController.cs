@@ -5,7 +5,6 @@ using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Services.Utils;
-using PontoAll.WebAPI.Objects.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 

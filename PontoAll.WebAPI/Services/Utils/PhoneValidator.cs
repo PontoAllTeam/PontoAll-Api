@@ -1,6 +1,6 @@
 using PontoAll.WebAPI.Services.Utils;
 
-namespace PontoAll.WebAPI.Objects.Utils;
+namespace PontoAll.WebAPI.Services.Utils;
 
 public static class PhoneValidator
 {

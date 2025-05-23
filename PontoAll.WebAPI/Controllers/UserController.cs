@@ -5,7 +5,6 @@ using PontoAll.WebAPI.Objects.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using PontoAll.WebAPI.Services.Utils;
-using PontoAll.WebAPI.Objects.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 

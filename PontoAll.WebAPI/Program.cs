@@ -5,9 +5,9 @@ using Microsoft.OpenApi.Models;
 using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Data.Repositories;
 using PontoAll.WebAPI.Data;
-using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
+using PontoAll.WebAPI.Services.Utils;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);

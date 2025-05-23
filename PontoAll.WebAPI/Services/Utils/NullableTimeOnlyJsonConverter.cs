@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace PontoAll.WebAPI.Objects.Utils;
+namespace PontoAll.WebAPI.Services.Utils;
 public class NullableTimeOnlyJsonConverter : JsonConverter<TimeOnly?>
 {
     public override TimeOnly? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

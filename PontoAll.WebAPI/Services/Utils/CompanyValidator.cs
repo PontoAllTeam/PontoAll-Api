@@ -2,7 +2,7 @@
 using PontoAll.WebAPI.Services.Utils;
 using System.Text.RegularExpressions;
 
-namespace PontoAll.WebAPI.Objects.Utils;
+namespace PontoAll.WebAPI.Services.Utils;
 
 public static class CompanyValidator
 {

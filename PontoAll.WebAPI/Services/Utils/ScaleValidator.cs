@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Linq;
 
-namespace PontoAll.WebAPI.Objects.Utils;
+namespace PontoAll.WebAPI.Services.Utils;
 
 public static class ScaleValidator
 {
