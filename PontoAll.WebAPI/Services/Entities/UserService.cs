@@ -3,8 +3,9 @@ using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Objects.Models;
-using PontoAll.WebAPI.Objects.Utils;
+using PontoAll.WebAPI.Controllers;
 using PontoAll.WebAPI.Services.Interfaces;
+using static PontoAll.WebAPI.Controllers.UserController;
 
 namespace PontoAll.WebAPI.Services.Entities;
 
