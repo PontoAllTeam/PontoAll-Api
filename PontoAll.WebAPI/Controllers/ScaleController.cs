@@ -68,7 +68,37 @@ public class ScaleController : Controller
 
         try
         {
-            // Verifica se o ID já está cadastrado no banco
+            if (scaleDTO.Day < 1 || scaleDTO.Day > 31)
+                throw new Exception("Dia inválido.");
+
+            if (!DateValidator.IsValidMonth(scaleDTO.YearMonth))
+                throw new Exception("Ano/mês inválido.");
+
+            if (scaleDTO.DayType < 1 || scaleDTO.DayType > 7)
+                throw new Exception("Dia da semana inválido.");
+
+            var pickProperties = typeof(ScaleDTO).GetProperties()
+              .Where(p => p.Name.StartsWith("Pick"))
+              .OrderBy(p => p.Name)
+              .ToList();
+
+            TimeOnly? previous = null;
+            foreach (var prop in pickProperties)
+            {
+                var value = prop.GetValue(scaleDTO) as string;
+
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    if (!TimeOnly.TryParse(value, out var current))
+                        throw new Exception($"{prop.Name} contém um horário inválido. Use o formato HH:mm:ss.");
+
+                    if (previous.HasValue && current < previous)
+                        throw new Exception($"{prop.Name} deve ser maior que o horário anterior.");
+
+                    previous = current;
+                }
+            }
+
             var existingScale = await _scaleService.GetById(scaleDTO.Id);
             if (existingScale != null)
             {
@@ -77,8 +107,6 @@ public class ScaleController : Controller
                 _response.Message = "ID já cadastrado.";
                 return BadRequest(_response);
             }
-
-            ScaleValidator.Validate(scaleDTO);
 
             await _scaleService.Create(scaleDTO);
 
@@ -102,7 +130,7 @@ public class ScaleController : Controller
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, ScaleDTO scaleDTO)
+    public async Task<IActionResult> Put(int id, [FromBody] ScaleDTO scaleDTO)
     {
         if (scaleDTO is null)
         {
@@ -114,6 +142,37 @@ public class ScaleController : Controller
 
         try
         {
+            if (scaleDTO.Day < 1 || scaleDTO.Day > 31)
+                throw new Exception("Dia inválido.");
+
+            if (!DateValidator.IsValidMonth(scaleDTO.YearMonth))
+                throw new Exception("Ano/mês inválido.");
+
+            if (scaleDTO.DayType < 1 || scaleDTO.DayType > 7)
+                throw new Exception("Dia da semana inválido.");
+
+            var pickProperties = typeof(ScaleDTO).GetProperties()
+                .Where(p => p.Name.StartsWith("Pick"))
+                .OrderBy(p => p.Name)
+                .ToList();
+
+            TimeOnly? previous = null;
+            foreach (var prop in pickProperties)
+            {
+                var value = prop.GetValue(scaleDTO) as string;
+
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    if (!TimeOnly.TryParse(value, out var current))
+                        throw new Exception($"{prop.Name} contém um horário inválido. Use o formato HH:mm:ss.");
+
+                    if (previous.HasValue && current < previous)
+                        throw new Exception($"{prop.Name} deve ser maior que o horário anterior.");
+
+                    previous = current;
+                }
+            }
+
             var existingScaleDTO = await _scaleService.GetById(id);
             if (existingScaleDTO is null)
             {
@@ -131,11 +190,9 @@ public class ScaleController : Controller
                     _response.Code = ResponseEnum.INVALID;
                     _response.Data = null;
                     _response.Message = "ID já cadastrado.";
-                    return BadRequest(_response); 
+                    return BadRequest(_response);
                 }
             }
-
-            ScaleValidator.Validate(scaleDTO);
 
             await _scaleService.Update(scaleDTO, id);
 
@@ -157,8 +214,6 @@ public class ScaleController : Controller
             return BadRequest(_response);
         }
     }
-
-
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)

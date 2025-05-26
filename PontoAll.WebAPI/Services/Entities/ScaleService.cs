@@ -2,7 +2,6 @@ using AutoMapper;
 using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Objects.Models;
-using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Services.Entities;
@@ -20,13 +19,11 @@ public class ScaleService : GenericService<Scale, ScaleDTO>, IScaleService
 
     public async Task CreateValidatedAsync(ScaleDTO dto)
     {
-        ScaleValidator.Validate(dto);
         await Create(dto);
     }
 
     public async Task UpdateValidatedAsync(ScaleDTO dto, int id)
     {
-        ScaleValidator.Validate(dto);
         await Update(dto, id);
     }
 }
