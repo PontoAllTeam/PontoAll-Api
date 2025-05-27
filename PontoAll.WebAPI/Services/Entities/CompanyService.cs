@@ -3,6 +3,7 @@ using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Objects.Models;
 using PontoAll.WebAPI.Services.Interfaces;
+using PontoAll.WebAPI.Services.Utils;
 using System.Text.RegularExpressions;
 
 namespace PontoAll.WebAPI.Services.Entities;
@@ -33,7 +34,7 @@ public class CompanyService : GenericService<Company, CompanyDTO>, ICompanyServi
 
     public async Task UpdateValidatedAsync(CompanyDTO dto, int id)
     {
-        NormalizeCompanyFields(dto); 
+        NormalizeCompanyFields(dto);
 
         CompanyValidator.Validate(dto);
 

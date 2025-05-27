@@ -1,8 +1,5 @@
 ﻿using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Utils;
-using PontoAll.WebAPI.Objects.Models;
-
-namespace PontoAll.WebAPI.Services.Utils;
 
 public static class CpfCnpjValidator
 {
@@ -11,8 +8,24 @@ public static class CpfCnpjValidator
         user.Cpf = StringUtils.ExtractNumbers(user.Cpf);
 
         if (!IsValidCPF(user.Cpf))
-        throw new Exception("CPF inválido.");
+            throw new Exception("CPF inválido.");
     }
+
+    public static void Validate(CompanyDTO company)
+    {
+        company.Cnpj = StringUtils.ExtractNumbers(company.Cnpj);
+
+        if (!IsValidCNPJ(company.Cnpj))
+            throw new Exception("CNPJ inválido.");
+    }
+
+    public static bool IsValidCNPJ(string cnpj)
+    {
+        cnpj = StringUtils.ExtractNumbers(cnpj);
+
+        return cnpj.Length == 14 && long.TryParse(cnpj, out _);
+    }
+
     private static bool IsValidCPF(string cpf)
     {
         if (cpf.Length != 11 || !cpf.All(char.IsDigit))

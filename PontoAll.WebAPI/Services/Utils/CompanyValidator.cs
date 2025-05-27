@@ -1,7 +1,6 @@
 ﻿using PontoAll.WebAPI.Objects.Dtos.Entities;
+using PontoAll.WebAPI.Services.Utils;
 using System.Text.RegularExpressions;
-
-namespace PontoAll.WebAPI.Services.Utils;
 
 public static class CompanyValidator
 {
@@ -10,8 +9,8 @@ public static class CompanyValidator
         if (string.IsNullOrWhiteSpace(company.FantasyName))
             throw new ArgumentException("Nome fantasia é obrigatório.");
 
-        if (!IsValidCNPJ(company.Cnpj))
-            throw new ArgumentException("CNPJ inválido.");
+        // Validação de CNPJ agora é responsabilidade do CpfCnpjValidator
+        CpfCnpjValidator.Validate(company);
 
         if (string.IsNullOrWhiteSpace(company.BusinessPhone))
             throw new ArgumentException("Telefone comercial é obrigatório.");
@@ -25,7 +24,6 @@ public static class CompanyValidator
         if (!IsValidState(company.State))
             throw new ArgumentException("Estado inválido (use UF).");
 
-        // ➕ Novas validações
         if (string.IsNullOrWhiteSpace(company.City))
             throw new ArgumentException("Cidade é obrigatória.");
 
@@ -34,13 +32,6 @@ public static class CompanyValidator
 
         if (string.IsNullOrWhiteSpace(company.Neighborhood))
             throw new ArgumentException("Bairro é obrigatório.");
-    }
-
-
-    public static bool IsValidCNPJ(string cnpj)
-    {
-        cnpj = StringUtils.ExtractNumbers(cnpj);
-        return cnpj.Length == 14 && long.TryParse(cnpj, out _);
     }
 
     private static bool IsValidCEP(string cep)
