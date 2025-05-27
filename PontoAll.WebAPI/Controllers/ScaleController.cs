@@ -13,47 +13,47 @@ namespace PontoAll.WebAPI.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class ScaleController : Controller
 {
-    private readonly IScaleService _scaleService;
-    private readonly Response _response;
+    private readonly IScaleService _scaleService;
+    private readonly Response _response;
 
-    public ScaleController(IScaleService scaleService)
-    {
-        _scaleService = scaleService;
-        _response = new Response();
-    }
+    public ScaleController(IScaleService scaleService)
+    {
+        _scaleService = scaleService;
+        _response = new Response();
+    }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var scalesDTO = await _scaleService.GetAll();
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var scalesDTO = await _scaleService.GetAll();
 
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = scalesDTO;
-        _response.Message = "Escalas listadas com sucesso";
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = scalesDTO;
+        _response.Message = "Escalas listadas com sucesso";
 
-        return Ok(_response);
-    }
+        return Ok(_response);
+    }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
-    {
-        var scaleDTO = await _scaleService.GetById(id);
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+        var scaleDTO = await _scaleService.GetById(id);
 
-        if (scaleDTO is null)
-        {
-            _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = null;
-            _response.Message = "Escala não encontrada";
+        if (scaleDTO is null)
+        {
+            _response.Code = ResponseEnum.NOT_FOUND;
+            _response.Data = null;
+            _response.Message = "Escala não encontrada";
 
-            return NotFound(_response);
-        }
+            return NotFound(_response);
+        }
 
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = scaleDTO;
-        _response.Message = "Escala listada com sucesso";
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = scaleDTO;
+        _response.Message = "Escala listada com sucesso";
 
-        return Ok(_response);
-    }
+        return Ok(_response);
+    }
 
     [HttpPost]
     public async Task<IActionResult> Post([FromBody] ScaleDTO scaleDTO)
@@ -68,36 +68,7 @@ public class ScaleController : Controller
 
         try
         {
-            if (scaleDTO.Day < 1 || scaleDTO.Day > 31)
-                throw new Exception("Dia inválido.");
-
-            if (!DateValidator.IsValidMonth(scaleDTO.YearMonth))
-                throw new Exception("Ano/mês inválido.");
-
-            if (scaleDTO.DayType < 1 || scaleDTO.DayType > 7)
-                throw new Exception("Dia da semana inválido.");
-
-            var pickProperties = typeof(ScaleDTO).GetProperties()
-              .Where(p => p.Name.StartsWith("Pick"))
-              .OrderBy(p => p.Name)
-              .ToList();
-
-            TimeOnly? previous = null;
-            foreach (var prop in pickProperties)
-            {
-                var value = prop.GetValue(scaleDTO) as string;
-
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    if (!TimeOnly.TryParse(value, out var current))
-                        throw new Exception($"{prop.Name} contém um horário inválido. Use o formato HH:mm:ss.");
-
-                    if (previous.HasValue && current < previous)
-                        throw new Exception($"{prop.Name} deve ser maior que o horário anterior.");
-
-                    previous = current;
-                }
-            }
+            ValidateScale(scaleDTO);
 
             var existingScale = await _scaleService.GetById(scaleDTO.Id);
             if (existingScale != null)
@@ -142,36 +113,7 @@ public class ScaleController : Controller
 
         try
         {
-            if (scaleDTO.Day < 1 || scaleDTO.Day > 31)
-                throw new Exception("Dia inválido.");
-
-            if (!DateValidator.IsValidMonth(scaleDTO.YearMonth))
-                throw new Exception("Ano/mês inválido.");
-
-            if (scaleDTO.DayType < 1 || scaleDTO.DayType > 7)
-                throw new Exception("Dia da semana inválido.");
-
-            var pickProperties = typeof(ScaleDTO).GetProperties()
-                .Where(p => p.Name.StartsWith("Pick"))
-                .OrderBy(p => p.Name)
-                .ToList();
-
-            TimeOnly? previous = null;
-            foreach (var prop in pickProperties)
-            {
-                var value = prop.GetValue(scaleDTO) as string;
-
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    if (!TimeOnly.TryParse(value, out var current))
-                        throw new Exception($"{prop.Name} contém um horário inválido. Use o formato HH:mm:ss.");
-
-                    if (previous.HasValue && current < previous)
-                        throw new Exception($"{prop.Name} deve ser maior que o horário anterior.");
-
-                    previous = current;
-                }
-            }
+            ValidateScale(scaleDTO);
 
             var existingScaleDTO = await _scaleService.GetById(id);
             if (existingScaleDTO is null)
@@ -216,37 +158,51 @@ public class ScaleController : Controller
     }
 
     [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        try
-        {
-            var existingScaleDTO = await _scaleService.GetById(id);
-            if (existingScaleDTO is null)
-            {
-                _response.Code = ResponseEnum.NOT_FOUND;
-                _response.Data = null;
-                _response.Message = "A escala informada não existe";
-                return NotFound(_response);
-            }
+    public async Task<IActionResult> Delete(int id)
+    {
+        try
+        {
+            var existingScaleDTO = await _scaleService.GetById(id);
+            if (existingScaleDTO is null)
+            {
+                _response.Code = ResponseEnum.NOT_FOUND;
+                _response.Data = null;
+                _response.Message = "A escala informada não existe";
+                return NotFound(_response);
+            }
 
-            await _scaleService.Remove(id);
+            await _scaleService.Remove(id);
 
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = null;
-            _response.Message = "Escala removida com sucesso";
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = null;
+            _response.Message = "Escala removida com sucesso";
 
-            return Ok(_response);
-        }
-        catch (Exception ex)
-        {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar remover a escala";
-            _response.Data = new
-            {
-                ErrorMessage = ex.Message,
-                StackTrace = ex.StackTrace ?? "No stack trace available"
-            };
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
-        }
-    }
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Ocorreu um erro ao tentar remover a escala";
+            _response.Data = new
+            {
+                ErrorMessage = ex.Message,
+                StackTrace = ex.StackTrace ?? "No stack trace available"
+            };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
+
+    private void ValidateScale(ScaleDTO scaleDTO)
+    {
+        if (scaleDTO.Day < 1 || scaleDTO.Day > 31)
+            throw new Exception("Dia inválido.");
+
+        if (!DateValidator.IsValidMonth(scaleDTO.YearMonth))
+            throw new Exception("Ano/mês inválido.");
+
+        if (scaleDTO.DayType < 1 || scaleDTO.DayType > 7)
+            throw new Exception("Dia da semana inválido.");
+
+        TimeValidator.ValidateTime(scaleDTO);
+    }
 }
