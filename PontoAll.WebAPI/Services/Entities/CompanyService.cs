@@ -2,7 +2,6 @@
 using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Objects.Models;
-using PontoAll.WebAPI.Objects.Utils;
 using PontoAll.WebAPI.Services.Interfaces;
 using System.Text.RegularExpressions;
 

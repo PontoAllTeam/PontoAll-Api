@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using PontoAll.WebAPI.Objects.Utils;
+using PontoAll.WebAPI.Services.Utils;
 
 namespace PontoAll.WebAPI.Objects.Dtos.Entities;
 
