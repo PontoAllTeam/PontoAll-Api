@@ -5,6 +5,7 @@ using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Services.Utils;
+using System.Text.RegularExpressions;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -63,22 +64,32 @@ public class CompanyController : Controller
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Dados inválidos";
-
             return BadRequest(_response);
         }
+
+        NormalizeCompanyFields(companyDTO);
 
         if (!CheckCompanyInfo(companyDTO))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = companyDTO;
             _response.Message = "Formato incorreto de email ou telefone";
-
             return BadRequest(_response);
         }
 
         try
         {
-            await _companyService.CreateValidatedAsync(companyDTO); 
+            CompanyValidator.Validate(companyDTO);
+
+            var existing = await _companyService.GetAll();
+            if (existing.Any(c => c.Cnpj == companyDTO.Cnpj))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Message = "CNPJ já cadastrado.";
+                return BadRequest(_response);
+            }
+
+            await _companyService.Create(companyDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = companyDTO;
@@ -86,18 +97,10 @@ public class CompanyController : Controller
 
             return Ok(_response);
         }
-        catch (ArgumentException ex)
-        {
-            _response.Code = ResponseEnum.INVALID;
-            _response.Message = ex.Message;
-            _response.Data = null;
-
-            return BadRequest(_response);
-        }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Não foi possível cadastrar a empresa";
+            _response.Message = "Erro ao cadastrar empresa";
             _response.Data = new
             {
                 ErrorMessage = ex.Message,
@@ -106,7 +109,6 @@ public class CompanyController : Controller
 
             return StatusCode(StatusCodes.Status500InternalServerError, _response);
         }
-
     }
 
     [HttpPut("{id}")]
@@ -117,16 +119,16 @@ public class CompanyController : Controller
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Dados inválidos";
-
             return BadRequest(_response);
         }
+
+        NormalizeCompanyFields(companyDTO);
 
         if (!CheckCompanyInfo(companyDTO))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = companyDTO;
             _response.Message = "Formato incorreto de email ou telefone";
-
             return BadRequest(_response);
         }
 
@@ -141,7 +143,18 @@ public class CompanyController : Controller
                 return NotFound(_response);
             }
 
-            await _companyService.UpdateValidatedAsync(companyDTO, id);
+            CompanyValidator.Validate(companyDTO);
+
+            var allCompanies = await _companyService.GetAll();
+            var cnpjDuplicado = allCompanies.Any(c => c.Cnpj == companyDTO.Cnpj && c.Id != id);
+            if (cnpjDuplicado)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Message = "CNPJ já cadastrado por outra empresa.";
+                return BadRequest(_response);
+            }
+
+            await _companyService.Update(companyDTO, id);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = companyDTO;
@@ -152,7 +165,7 @@ public class CompanyController : Controller
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar atualizar os dados da empresa";
+            _response.Message = "Erro ao atualizar empresa";
             _response.Data = new
             {
                 ErrorMessage = ex.Message,
@@ -187,7 +200,7 @@ public class CompanyController : Controller
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar remover a empresa";
+            _response.Message = "Erro ao remover empresa";
             _response.Data = new
             {
                 ErrorMessage = ex.Message,
@@ -199,26 +212,16 @@ public class CompanyController : Controller
 
     private static bool CheckCompanyInfo(CompanyDTO companyDTO)
     {
-        bool isValidCnpj = CompanyValidator.IsValidCNPJ(companyDTO.Cnpj);
+        bool isValidCnpj = CpfCnpjValidator.IsValidCNPJ(companyDTO.Cnpj);
         bool isValidEmail = EmailValidator.IsValidEmail(companyDTO.Email);
 
         return isValidCnpj && isValidEmail;
     }
 
-
-    private static bool CheckDuplicates(IEnumerable<CompanyDTO> companiesDTO, CompanyDTO companyDTO)
+    private static void NormalizeCompanyFields(CompanyDTO dto)
     {
-        foreach (var company in companiesDTO)
-        {
-            if (companyDTO.Id == company.Id)
-                continue;
-
-            if (StringUtils.CompareString(companyDTO.Email, company.Email) ||
-                StringUtils.CompareString(companyDTO.Cnpj, company.Cnpj))
-                return true;
-        }
-
-        return false;
+        dto.Cep = Regex.Replace(dto.Cep ?? "", @"[^\d]", "");
+        dto.Cnpj = Regex.Replace(dto.Cnpj ?? "", @"[^\d]", "");
+        dto.BusinessPhone = Regex.Replace(dto.BusinessPhone ?? "", @"[^\d]", "");
     }
-
 }

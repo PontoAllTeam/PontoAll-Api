@@ -16,14 +16,4 @@ public class ScaleService : GenericService<Scale, ScaleDTO>, IScaleService
         _scaleRepository = repository;
         _mapper = mapper;
     }
-
-    public async Task CreateValidatedAsync(ScaleDTO dto)
-    {
-        await Create(dto);
-    }
-
-    public async Task UpdateValidatedAsync(ScaleDTO dto, int id)
-    {
-        await Update(dto, id);
-    }
 }

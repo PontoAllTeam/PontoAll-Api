@@ -5,6 +5,7 @@ namespace PontoAll.WebAPI.Services.Interfaces;
 
 public interface ICompanyService : IGenericService<Company, CompanyDTO>
 {
-    Task CreateValidatedAsync(CompanyDTO dto);
-    Task UpdateValidatedAsync(CompanyDTO dto, int id);
+    // Removi esses métodos porque a validação agora está na Controller
+    // Task CreateValidatedAsync(CompanyDTO dto);
+    // Task UpdateValidatedAsync(CompanyDTO dto, int id);
 }

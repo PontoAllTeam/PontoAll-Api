@@ -4,7 +4,6 @@ using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Objects.Models;
 using PontoAll.WebAPI.Services.Interfaces;
-using PontoAll.WebAPI.Services.Utils;
 
 namespace PontoAll.WebAPI.Services.Entities;
 
@@ -25,25 +24,9 @@ public class UserService : GenericService<User, UserDTO>, IUserService
         return _mapper.Map<UserDTO>(user);
     }
 
-    public async Task<UserDTO?> Login(Login login)
+    public async Task<UserDTO> Login(Login login)
     {
-        var user = await _userRepository.GetByEmail(login.Email);
-        if (user == null || user.Password != login.Password)
-        {
-            return null;
-        }
+        var user = await _userRepository.Login(login);
         return _mapper.Map<UserDTO>(user);
-    }
-
-    public async Task Create(UserDTO dto)
-    {
-        CpfCnpjValidator.Validate(dto);
-        await base.Create(dto);
-    }
-
-    public async Task Update(UserDTO dto, int id)
-    {
-        CpfCnpjValidator.Validate(dto);
-        await base.Update(dto, id);
     }
 }
