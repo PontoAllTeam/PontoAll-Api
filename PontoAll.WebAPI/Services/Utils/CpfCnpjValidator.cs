@@ -1,6 +1,7 @@
 ﻿using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Utils;
 
+namespace PontoAll.WebAPI.Services.Utils;
 public static class CpfCnpjValidator
 {
     public static void Validate(UserDTO user)
