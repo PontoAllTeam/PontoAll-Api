@@ -126,14 +126,10 @@ public class ScaleController : Controller
 
             if (id != scaleDTO.Id)
             {
-                var existingScaleById = await _scaleService.GetById(scaleDTO.Id);
-                if (existingScaleById != null)
-                {
-                    _response.Code = ResponseEnum.INVALID;
-                    _response.Data = null;
-                    _response.Message = "ID já cadastrado.";
-                    return BadRequest(_response);
-                }
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "O ID da URL não corresponde ao ID do corpo da requisição.";
+                return BadRequest(_response);
             }
 
             await _scaleService.Update(scaleDTO, id);
@@ -156,6 +152,7 @@ public class ScaleController : Controller
             return BadRequest(_response);
         }
     }
+
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
@@ -203,6 +200,36 @@ public class ScaleController : Controller
         if (scaleDTO.DayType < 1 || scaleDTO.DayType > 7)
             throw new Exception("Dia da semana inválido.");
 
-        TimeValidator.ValidateTime(scaleDTO);
+        // Validação apenas do formato de cada campo de horário
+        var pickProperties = typeof(ScaleDTO).GetProperties()
+            .Where(p => p.Name.StartsWith("Pick"))
+            .OrderBy(p => p.Name)
+            .ToList();
+
+        TimeOnly? previous = null;
+
+        foreach (var prop in pickProperties)
+        {
+            var value = prop.GetValue(scaleDTO);
+
+            TimeValidator.ValidateTime(value, prop.Name);
+
+            if (value is string str && TimeOnly.TryParse(str, out var current))
+            {
+                if (previous.HasValue && current < previous)
+                {
+                    throw new Exception($"{prop.Name} deve ser maior ou igual ao horário anterior.");
+                }
+                previous = current;
+            }
+            else if (value is TimeOnly currentTime)
+            {
+                if (previous.HasValue && currentTime < previous)
+                {
+                    throw new Exception($"{prop.Name} deve ser maior ou igual ao horário anterior.");
+                }
+                previous = currentTime;
+            }
+        }
     }
 }

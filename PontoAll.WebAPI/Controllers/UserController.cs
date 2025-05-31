@@ -66,60 +66,73 @@ public class UserController : Controller
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Dados inválidos";
-
             return BadRequest(_response);
         }
 
-        try
+        // Validação de CPF ou CNPJ
+        var cpfCnpjNumbers = StringUtils.ExtractNumbers(userDTO.Cpf);
+        if (cpfCnpjNumbers.Length == 11)
         {
-            // Validação que estava no service, agora na controller
-            CpfCnpjValidator.Validate(userDTO);
-
-            if (!CheckUserInfo(userDTO))
+            if (!CpfCnpjValidator.IsValidCPF(userDTO.Cpf))
             {
                 _response.Code = ResponseEnum.INVALID;
                 _response.Data = null;
-                _response.Message = "Formato incorreto de email ou telefone";
-
+                _response.Message = "CPF inválido";
                 return BadRequest(_response);
             }
-
-            var usersDTO = await _userService.GetAll();
-
-            if (CheckDuplicates(usersDTO, userDTO))
-            {
-                _response.Code = ResponseEnum.CONFLICT;
-                _response.Data = null;
-                _response.Message = "Este e-mail já está em uso";
-
-                return BadRequest(_response);
-            }
-
-            // Zera o Id para o banco gerar
-            userDTO.Id = 0;
-            userDTO.Password = StringUtils.HashString(userDTO.Password);
-
-            await _userService.Create(userDTO);
-
-            userDTO.Password = "";
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = userDTO;
-            _response.Message = "Usuário cadastrado com sucesso";
-
-            return Ok(_response);
         }
-        catch (Exception ex)
+        else if (cpfCnpjNumbers.Length == 14)
         {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Não foi possível cadastrar o usuário";
-            _response.Data = new
+            if (!CpfCnpjValidator.IsValidCNPJ(userDTO.Cpf))
             {
-                ErrorMessage = ex.Message,
-                StackTrace = ex.StackTrace ?? "No stack trace available"
-            };
-
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "CNPJ inválido";
+                return BadRequest(_response);
+            }
         }
+        else
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "CPF ou CNPJ inválido";
+            return BadRequest(_response);
+        }
+
+        // Validação de e-mail e telefone com mensagens específicas
+        try
+        {
+            EmailValidator.IsValidEmail(userDTO.Email);
+            PhoneValidator.Validate(userDTO.Phone);
+        }
+        catch (ArgumentException ex)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = ex.Message;
+            return BadRequest(_response);
+        }
+
+        var usersDTO = await _userService.GetAll();
+        if (CheckDuplicates(usersDTO, userDTO))
+        {
+            _response.Code = ResponseEnum.CONFLICT;
+            _response.Data = null;
+            _response.Message = "Este e-mail já está em uso";
+            return BadRequest(_response);
+        }
+
+        userDTO.Id = 0;
+        userDTO.Password = StringUtils.HashString(userDTO.Password);
+
+        await _userService.Create(userDTO);
+
+        userDTO.Password = "";
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = userDTO;
+        _response.Message = "Usuário cadastrado com sucesso";
+
+        return Ok(_response);
     }
 
     [HttpPost("Login")]
@@ -135,12 +148,15 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
-        if (!EmailValidator.IsValidEmail(login.Email))
+        try
+        {
+            EmailValidator.IsValidEmail(login.Email);
+        }
+        catch (ArgumentException ex)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = login;
-            _response.Message = "Formato de email incorreto";
-
+            _response.Data = null;
+            _response.Message = ex.Message;
             return BadRequest(_response);
         }
 
@@ -242,67 +258,78 @@ public class UserController : Controller
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Dados inválidos";
+            return BadRequest(_response);
+        }
 
+        var existingUserDTO = await _userService.GetById(id);
+        if (existingUserDTO is null)
+        {
+            _response.Code = ResponseEnum.NOT_FOUND;
+            _response.Data = null;
+            _response.Message = "O usuário informado não existe";
+            return NotFound(_response);
+        }
+
+        var cpfCnpjNumbers = StringUtils.ExtractNumbers(userDTO.Cpf);
+        if (cpfCnpjNumbers.Length == 11)
+        {
+            if (!CpfCnpjValidator.IsValidCPF(userDTO.Cpf))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "CPF inválido";
+                return BadRequest(_response);
+            }
+        }
+        else if (cpfCnpjNumbers.Length == 14)
+        {
+            if (!CpfCnpjValidator.IsValidCNPJ(userDTO.Cpf))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "CNPJ inválido";
+                return BadRequest(_response);
+            }
+        }
+        else
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "CPF ou CNPJ inválido";
             return BadRequest(_response);
         }
 
         try
         {
-            var existingUserDTO = await _userService.GetById(id);
-            if (existingUserDTO is null)
-            {
-                _response.Code = ResponseEnum.NOT_FOUND;
-                _response.Data = null;
-                _response.Message = "O usuário informado não existe";
-
-                return NotFound(_response);
-            }
-
-            // Validação que estava no service, agora na controller
-            CpfCnpjValidator.Validate(userDTO);
-
-            if (!CheckUserInfo(userDTO))
-            {
-                _response.Code = ResponseEnum.INVALID;
-                _response.Data = null;
-                _response.Message = "Formato incorreto de email ou telefone";
-
-                return BadRequest(_response);
-            }
-
-            var usersDTO = await _userService.GetAll();
-
-            if (CheckDuplicates(usersDTO, userDTO))
-            {
-                userDTO.Password = "";
-                _response.Code = ResponseEnum.CONFLICT;
-                _response.Data = userDTO;
-                _response.Message = "Este e-mail já está em uso";
-
-                return BadRequest(_response);
-            }
-
-            await _userService.Update(userDTO, id);
-
-            userDTO.Password = "";
-            _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = userDTO;
-            _response.Message = "Usuário atualizado com sucesso";
-
-            return Ok(_response);
+            EmailValidator.IsValidEmail(userDTO.Email);
+            PhoneValidator.Validate(userDTO.Phone);
         }
-        catch (Exception ex)
+        catch (ArgumentException ex)
         {
-            _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar atualizar os dados do usuário";
-            _response.Data = new
-            {
-                ErrorMessage = ex.Message,
-                StackTrace = ex.StackTrace ?? "No stack trace available"
-            };
-
-            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = ex.Message;
+            return BadRequest(_response);
         }
+
+        var usersDTO = await _userService.GetAll();
+        if (CheckDuplicates(usersDTO, userDTO))
+        {
+            userDTO.Password = "";
+            _response.Code = ResponseEnum.CONFLICT;
+            _response.Data = userDTO;
+            _response.Message = "Este e-mail já está em uso";
+            return BadRequest(_response);
+        }
+
+        await _userService.Update(userDTO, id);
+
+        userDTO.Password = "";
+        _response.Code = ResponseEnum.SUCCESS;
+        _response.Data = userDTO;
+        _response.Message = "Usuário atualizado com sucesso";
+
+        return Ok(_response);
     }
 
     [HttpDelete("{id}")]
@@ -316,7 +343,6 @@ public class UserController : Controller
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
                 _response.Message = "O usuário informado não existe";
-
                 return NotFound(_response);
             }
 
@@ -325,7 +351,6 @@ public class UserController : Controller
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = null;
             _response.Message = "Usuário removido com sucesso";
-
             return Ok(_response);
         }
         catch (Exception ex)
@@ -342,18 +367,11 @@ public class UserController : Controller
         }
     }
 
-    private static bool CheckUserInfo(UserDTO userDTO)
-    {
-        return PhoneValidator.IsValidPhone(userDTO.Phone)
-            && EmailValidator.IsValidEmail(userDTO.Email)
-            && EmailValidator.IsValidEmail(userDTO.RecoveryEmail);
-    }
+    // ===== Métodos auxiliares para validações internas =====
 
-    private static bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
+    private bool CheckDuplicates(IEnumerable<UserDTO> usersDTO, UserDTO userDTO)
     {
-        // Retorna true se já existir e-mail igual e Id diferente
-        return usersDTO.Any(x =>
-            x.Email == userDTO.Email &&
-            x.Id != userDTO.Id);
+        return usersDTO.Any(u => u.Email.Equals(userDTO.Email, StringComparison.OrdinalIgnoreCase)
+            && u.Id != userDTO.Id);
     }
 }

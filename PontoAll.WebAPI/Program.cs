@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using PontoAll.WebAPI.Data;
 using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Data.Repositories;
-using PontoAll.WebAPI.Data;
 using PontoAll.WebAPI.Services.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using System.Text;
@@ -25,6 +25,7 @@ else
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
+builder.Services.AddControllers();
 builder.Services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
 {
     builder.WithOrigins("http://localhost:3000", "http://localhost:5173")
@@ -32,9 +33,7 @@ builder.Services.AddCors(o => o.AddPolicy("DefaultPolicy", builder =>
         .AllowAnyHeader()
         .AllowCredentials();
 }));
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -50,11 +49,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
-
-builder.Services.AddControllers();
-
-// Adicionado para evitar System.InvalidOperationException
-builder.Services.AddAuthorization();
 
 //Scoped Services and Interfaces
 builder.Services.AddSingleton<ITokenService, TokenService>();

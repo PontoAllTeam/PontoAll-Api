@@ -5,7 +5,6 @@ using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Services.Utils;
-using System.Text.RegularExpressions;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -43,9 +42,7 @@ public class CompanyController : Controller
         if (companyDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
-            _response.Data = null;
             _response.Message = "Empresa não encontrada";
-
             return NotFound(_response);
         }
 
@@ -62,18 +59,30 @@ public class CompanyController : Controller
         if (companyDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = null;
             _response.Message = "Dados inválidos";
             return BadRequest(_response);
         }
 
         NormalizeCompanyFields(companyDTO);
 
-        if (!CheckCompanyInfo(companyDTO))
+        if (!CpfCnpjValidator.IsValidCNPJ(companyDTO.Cnpj))
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = companyDTO;
-            _response.Message = "Formato incorreto de email ou telefone";
+            _response.Message = "CNPJ inválido.";
+            return BadRequest(_response);
+        }
+
+        if (!EmailValidator.IsValidEmail(companyDTO.Email))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = "Email inválido.";
+            return BadRequest(_response);
+        }
+
+        if (!PhoneValidator.IsValidPhone(companyDTO.BusinessPhone))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = "Telefone inválido. Use DDD + número, ex: 11999999999.";
             return BadRequest(_response);
         }
 
@@ -117,18 +126,30 @@ public class CompanyController : Controller
         if (companyDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = null;
             _response.Message = "Dados inválidos";
             return BadRequest(_response);
         }
 
         NormalizeCompanyFields(companyDTO);
 
-        if (!CheckCompanyInfo(companyDTO))
+        if (!CpfCnpjValidator.IsValidCNPJ(companyDTO.Cnpj))
         {
             _response.Code = ResponseEnum.INVALID;
-            _response.Data = companyDTO;
-            _response.Message = "Formato incorreto de email ou telefone";
+            _response.Message = "CNPJ inválido.";
+            return BadRequest(_response);
+        }
+
+        if (!EmailValidator.IsValidEmail(companyDTO.Email))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = "Email inválido.";
+            return BadRequest(_response);
+        }
+
+        if (!PhoneValidator.IsValidPhone(companyDTO.BusinessPhone))
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = "Telefone inválido. Use DDD + número, ex: 11999999999.";
             return BadRequest(_response);
         }
 
@@ -138,7 +159,6 @@ public class CompanyController : Controller
             if (existingCompanyDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
-                _response.Data = null;
                 _response.Message = "A empresa informada não existe";
                 return NotFound(_response);
             }
@@ -184,7 +204,6 @@ public class CompanyController : Controller
             if (existingCompanyDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
-                _response.Data = null;
                 _response.Message = "A empresa informada não existe";
                 return NotFound(_response);
             }
@@ -192,7 +211,6 @@ public class CompanyController : Controller
             await _companyService.Remove(id);
 
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = null;
             _response.Message = "Empresa removida com sucesso";
 
             return Ok(_response);
@@ -210,18 +228,10 @@ public class CompanyController : Controller
         }
     }
 
-    private static bool CheckCompanyInfo(CompanyDTO companyDTO)
-    {
-        bool isValidCnpj = CpfCnpjValidator.IsValidCNPJ(companyDTO.Cnpj);
-        bool isValidEmail = EmailValidator.IsValidEmail(companyDTO.Email);
-
-        return isValidCnpj && isValidEmail;
-    }
-
     private static void NormalizeCompanyFields(CompanyDTO dto)
     {
-        dto.Cep = Regex.Replace(dto.Cep ?? "", @"[^\d]", "");
-        dto.Cnpj = Regex.Replace(dto.Cnpj ?? "", @"[^\d]", "");
-        dto.BusinessPhone = Regex.Replace(dto.BusinessPhone ?? "", @"[^\d]", "");
+        dto.Cep = StringUtils.ExtractNumbers(dto.Cep);
+        dto.Cnpj = StringUtils.ExtractNumbers(dto.Cnpj);
+        dto.BusinessPhone = StringUtils.ExtractNumbers(dto.BusinessPhone);
     }
 }
