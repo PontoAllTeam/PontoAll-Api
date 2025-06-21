@@ -15,7 +15,6 @@ public class AppDbContext : DbContext
     public DbSet<Sector> Sectors { get; set; }
     public DbSet<MarkPoint> MarkPoints { get; set; }
     public DbSet<Geofence> Geofences { get; set; }
-    public DbSet<GeofencePoint> GeofencePoints { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,6 +27,5 @@ public class AppDbContext : DbContext
         SectorBuilder.Build(modelBuilder);
         MarkPointBuilder.Build(modelBuilder);
         GeofenceBuilder.Build(modelBuilder);
-        GeofencePointBuilder.Build(modelBuilder);
     }
 }

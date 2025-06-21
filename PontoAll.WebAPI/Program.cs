@@ -59,7 +59,6 @@ builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ISectorService, SectorService>();
 builder.Services.AddScoped<IMarkPointService, MarkPointService>();
 builder.Services.AddScoped<IGeofenceService, GeofenceService>();
-builder.Services.AddScoped<IGeofencePointService, GeofencePointService>();
 
 //Scoped Repositories and Interfaces
 builder.Services.AddScoped<IScaleRepository, ScaleRepository>();
@@ -69,7 +68,6 @@ builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ISectorRepository, SectorRepository>();
 builder.Services.AddScoped<IMarkPointRepository, MarkPointRepository>();
 builder.Services.AddScoped<IGeofenceRepository, GeofenceRepository>();
-builder.Services.AddScoped<IGeofencePointRepository, GeofencePointRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
