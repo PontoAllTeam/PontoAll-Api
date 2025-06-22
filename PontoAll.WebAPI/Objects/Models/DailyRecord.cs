@@ -36,6 +36,10 @@ public class DailyRecord
     [Column("reviewedat")]
     public DateTime? ReviewedAt { get; set; }
 
+    [Column("workscheduleid")]
+    public int WorkScheduleId { get; set; }
+    public WorkSchedule WorkSchedule { get; set; } = null!;
+
     [Column("employeeid")]
     public int EmployeeId { get; set; }
     public User Employee { get; set; } = null!;

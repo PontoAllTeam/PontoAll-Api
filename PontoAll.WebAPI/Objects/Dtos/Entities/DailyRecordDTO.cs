@@ -12,6 +12,7 @@ public class DailyRecordDTO
     public int ReviewStatus { get; set; }
     public string? ReviewerComments { get; set; }
     public DateTime? ReviewedAt { get; set; }
+    public int WorkScheduleId { get; set; }
     public int EmployeeId { get; set; }
     public int? ReviewerId { get; set; }
 }

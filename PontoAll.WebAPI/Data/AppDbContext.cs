@@ -31,5 +31,6 @@ public class AppDbContext : DbContext
         TimeRecordBuilder.Build(modelBuilder);
         SubscriptionPlanBuilder.Build(modelBuilder);
         PermissionRequestBuilder.Build(modelBuilder);
+        DailyRecordBuilder.Build(modelBuilder);
     }
 }
