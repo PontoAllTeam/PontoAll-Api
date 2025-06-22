@@ -13,10 +13,10 @@ namespace PontoAll.WebAPI.Controllers;
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 public class MarkPointController : Controller
 {
-    private readonly IMarkPointService _markPointService;
+    private readonly ITimeRecordService _markPointService;
     private readonly Response _response;
 
-    public MarkPointController(IMarkPointService markPointService)
+    public MarkPointController(ITimeRecordService markPointService)
     {
         _markPointService = markPointService;
         _response = new Response();

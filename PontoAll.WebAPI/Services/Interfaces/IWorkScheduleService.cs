@@ -3,7 +3,7 @@ using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Services.Interfaces;
 
-public interface IScaleService : IGenericService<WorkSchedule, WorkScheduleDTO>
+public interface IWorkScheduleService : IGenericService<WorkSchedule, WorkScheduleDTO>
 {
 
 }

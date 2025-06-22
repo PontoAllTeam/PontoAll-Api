@@ -3,7 +3,7 @@ using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Services.Interfaces;
 
-public interface IMarkPointService : IGenericService<TimeRecord, TimeRecordDTO>
+public interface ITimeRecordService : IGenericService<TimeRecord, TimeRecordDTO>
 {
 
 }

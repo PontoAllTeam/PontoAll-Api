@@ -52,12 +52,12 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 //Scoped Services and Interfaces
 builder.Services.AddSingleton<ITokenService, TokenService>();
-builder.Services.AddScoped<IScaleService, ScaleService>();
+builder.Services.AddScoped<IWorkScheduleService, WorkScheduleService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ISectorService, SectorService>();
-builder.Services.AddScoped<IMarkPointService, MarkPointService>();
+builder.Services.AddScoped<ITimeRecordService, TimeRecordService>();
 
 //Scoped Repositories and Interfaces
 builder.Services.AddScoped<IWorkScheduleRepository, WorkScheduleRepository>();
