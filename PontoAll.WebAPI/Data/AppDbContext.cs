@@ -14,6 +14,10 @@ public class AppDbContext : DbContext
     public DbSet<Department> Departments { get; set; }
     public DbSet<Sector> Sectors { get; set; }
     public DbSet<TimeRecord> TimeRecords { get; set; }
+    public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+    public DbSet<BiometricData> BiometricDatas { get; set; }
+    public DbSet<PermissionRequest> PermissionRequests { get; set; }
+    public DbSet<DailyRecord> DailyRecords { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
