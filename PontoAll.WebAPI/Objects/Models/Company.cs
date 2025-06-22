@@ -63,6 +63,6 @@ public class Company
         Street = street;
         Neighborhood = neighborhood;
         Number = number;
-        Status = status;
+        CompanyStatus = status;
     }
 }
