@@ -8,11 +8,11 @@ public class MappingProfile : Profile
 {
     public MappingProfile()
     {
-        CreateMap<ScaleDTO, Scale>().ReverseMap();
+        CreateMap<ScaleDTO, WorkSchedule>().ReverseMap();
         CreateMap<CompanyDTO, Company>().ReverseMap();
         CreateMap<UserDTO, User>().ReverseMap();
         CreateMap<DepartmentDTO, Department>().ReverseMap();
         CreateMap<SectorDTO, Sector>().ReverseMap();
-        CreateMap<MarkPointDTO, MarkPoint>().ReverseMap();
+        CreateMap<MarkPointDTO, TimeRecord>().ReverseMap();
     }
 }

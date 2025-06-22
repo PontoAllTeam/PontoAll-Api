@@ -3,5 +3,6 @@
 public enum CompanyStatus
 {
     ACTIVE = 1,
-    INACTIVE = 2
+    SUSPENDED = 2,
+    INACTIVE = 3,
 }

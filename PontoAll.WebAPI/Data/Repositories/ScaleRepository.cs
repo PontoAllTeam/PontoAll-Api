@@ -3,7 +3,7 @@ using PontoAll.WebAPI.Data.Interfaces;
 
 namespace PontoAll.WebAPI.Data.Repositories;
 
-public class ScaleRepository : GenericRepository<Scale>, IScaleRepository
+public class ScaleRepository : GenericRepository<WorkSchedule>, IScaleRepository
 {
     private readonly AppDbContext _context;
 

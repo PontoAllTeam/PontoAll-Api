@@ -30,11 +30,11 @@ public class User
     [Column("password")]
     public string Password { get; set; }
 
-    [Column("type")]
-    public UserType Type { get; set; }
+    [Column("usertype")]
+    public UserType UserType { get; set; }
 
-    [Column("status")]
-    public UserStatus Status { get; set; }
+    [Column("userstatus")]
+    public UserStatus UserStatus { get; set; }
 
     [Column("companyid")]
     public int CompanyId { get; set; }
@@ -42,7 +42,7 @@ public class User
     public Company Company { get; set; } = null!;
 
     public User() { }
-    public User(int id, string name, string cpf, string phone, string email, string recoveryEmail, string registration, string password, UserType type, UserStatus status, int companyId)
+    public User(int id, string name, string cpf, string phone, string email, string recoveryEmail, string registration, string password, UserType userType, UserStatus userStatus, int companyId)
     {
         Id = id;
         Name = name;
@@ -52,8 +52,8 @@ public class User
         RecoveryEmail = recoveryEmail;
         Registration = registration;
         Password = password;
-        Type = type;
-        Status = status;
+        UserType = userType;
+        UserStatus = userStatus;
         CompanyId = companyId;
     }
 }

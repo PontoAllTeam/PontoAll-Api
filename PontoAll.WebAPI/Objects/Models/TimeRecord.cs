@@ -3,8 +3,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PontoAll.WebAPI.Objects.Models;
 
-[Table("markpoint")]
-public class MarkPoint
+[Table("timerecord")]
+public class TimeRecord
 {
     [Column("id")]
     public int Id { get; set; }
@@ -18,18 +18,22 @@ public class MarkPoint
     [Column("location")]
     public Geolocation Location { get; set; }
 
+    [Column("justification")]
+    public string? Justification { get; set; }
+
     [Column("userid")]
     public int UserId { get; set; }
     public User User { get; set; } = null!;
 
-    public MarkPoint() { }
+    public TimeRecord() { }
 
-    public MarkPoint(int id, DateOnly date, TimeOnly time, Geolocation location, int userId)
+    public TimeRecord(int id, DateOnly date, TimeOnly time, Geolocation location, string? justification, int userId)
     {
         Id = id;
         Date = date;
         Time = time;
         Location = location;
         UserId = userId;
+        Justification = justification;
     }
 }

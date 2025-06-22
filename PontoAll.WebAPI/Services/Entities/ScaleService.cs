@@ -6,7 +6,7 @@ using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Services.Entities;
 
-public class ScaleService : GenericService<Scale, ScaleDTO>, IScaleService
+public class ScaleService : GenericService<WorkSchedule, ScaleDTO>, IScaleService
 {
     private readonly IScaleRepository _scaleRepository;
     private readonly IMapper _mapper;

@@ -2,7 +2,7 @@
 
 namespace PontoAll.WebAPI.Data.Interfaces;
 
-public interface IMarkPointRepository : IGenericRepository<MarkPoint>
+public interface IMarkPointRepository : IGenericRepository<TimeRecord>
 {
 
 }
