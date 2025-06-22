@@ -55,7 +55,7 @@ public class ScaleController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(ScaleDTO scaleDTO)
+    public async Task<IActionResult> Post(WorkScheduleDTO scaleDTO)
     {
         if (scaleDTO is null)
         {
@@ -90,7 +90,7 @@ public class ScaleController : Controller
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, ScaleDTO scaleDTO)
+    public async Task<IActionResult> Put(int id, WorkScheduleDTO scaleDTO)
     {
         if (scaleDTO is null)
         {

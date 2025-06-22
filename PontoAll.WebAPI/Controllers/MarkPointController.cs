@@ -54,7 +54,7 @@ public class MarkPointController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(MarkPointDTO markPointDTO)
+    public async Task<IActionResult> Post(TimeRecordDTO markPointDTO)
     {
         if (markPointDTO is null)
         {
@@ -98,7 +98,7 @@ public class MarkPointController : Controller
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, MarkPointDTO markPointDTO)
+    public async Task<IActionResult> Put(int id, TimeRecordDTO markPointDTO)
     {
         if (markPointDTO is null)
         {
