@@ -15,5 +15,6 @@ public class MappingProfile : Profile
         CreateMap<SectorDTO, Sector>().ReverseMap();
         CreateMap<TimeRecordDTO, TimeRecord>().ReverseMap();
         CreateMap<SubscriptionPlanDTO, SubscriptionPlan>().ReverseMap();
+        CreateMap<PermissionRequestDTO, PermissionRequest>().ReverseMap();
     }
 }

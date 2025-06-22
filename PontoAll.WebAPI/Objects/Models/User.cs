@@ -38,7 +38,6 @@ public class User
 
     [Column("companyid")]
     public int CompanyId { get; set; }
-
     public Company Company { get; set; } = null!;
 
     public User() { }

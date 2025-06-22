@@ -13,8 +13,8 @@ public class Department
 
     [Column("companyid")]
     public int CompanyId { get; set; }
+    public Company Company { get; set; } = null!;
 
-    public Company Company { get; set; } = null;
     public Department() { }
     public Department(int id, string name, int companyId)
     {

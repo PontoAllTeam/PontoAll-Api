@@ -50,7 +50,6 @@ public class WorkSchedule
 
     [Column("userid")]
     public int UserId { get; set; }
-
     public User User { get; set; } = null!;
 
     public WorkSchedule()
