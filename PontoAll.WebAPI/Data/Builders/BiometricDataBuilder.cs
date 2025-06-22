@@ -21,9 +21,12 @@ public class BiometricDataBuilder
         modelBuilder.Entity<BiometricData>().Property(b => b.CreatedAt).IsRequired();
         modelBuilder.Entity<BiometricData>().Property(b => b.UserId).IsRequired();
 
+        var embedding = new float[] { 0.123f, 0.456f, 0.789f };
+        var createdAt = new DateTime(2025, 6, 22, 12, 50, 20, DateTimeKind.Utc);
+
         modelBuilder.Entity<BiometricData>().HasData(new List<BiometricData>
         {
-            new(1, new float[] { 0.123f, 0.456f, 0.789f }, new DateTime(2025, 6, 22), 1),
+            new(1, embedding, createdAt, 1),
         });
     }
 }

@@ -18,9 +18,12 @@ public class PermissionRequestBuilder
         modelBuilder.Entity<PermissionRequest>().Property(pr => pr.RequesterId).IsRequired();
         modelBuilder.Entity<PermissionRequest>().Property(pr => pr.ReviewerId);
 
+        var requestDate = new DateTime(2025, 6, 18, 10, 8, 3, DateTimeKind.Utc);
+        var reviewDate = new DateTime(2025, 6, 30, 12, 9, 4, DateTimeKind.Utc);
+
         modelBuilder.Entity<PermissionRequest>().HasData(new List<PermissionRequest>
         {
-            new(1, 1, 1, "Preciso cadastrar um novo gerente", "Aprovado", PermissionType.CREATE_MANAGER, PermissionStatus.APPROVED, new DateTime(2025, 6, 18), new DateTime(2025, 6, 30)),
+            new(1, 2, 1, "Preciso cadastrar um novo gerente", "Aprovado", PermissionType.CREATE_MANAGER, PermissionStatus.APPROVED, requestDate, reviewDate),
         });
     }
 }

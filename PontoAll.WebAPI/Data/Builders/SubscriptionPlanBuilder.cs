@@ -20,9 +20,14 @@ public class SubscriptionPlanBuilder
         modelBuilder.Entity<SubscriptionPlan>().Property(sp => sp.AutoRenew).IsRequired();
         modelBuilder.Entity<SubscriptionPlan>().Property(sp => sp.CompanyId).IsRequired();
 
+        var startDate = new DateTime(2025, 6, 20, 12, 0, 0, DateTimeKind.Utc);
+        var endDate = new DateTime(2025, 6, 30, 23, 59, 59, DateTimeKind.Utc);
+        var createdAt = new DateTime(2025, 6, 20, 12, 0, 0, DateTimeKind.Utc);
+        var updatedAt = new DateTime(2025, 6, 21, 13, 30, 0, DateTimeKind.Utc);
+
         modelBuilder.Entity<SubscriptionPlan>().HasData(new List<SubscriptionPlan>
         {
-            new(1, SubscriptionPlanType.FREE_TRIAL, new DateTime(2025, 6, 20), new DateTime(2025, 6, 30), true, (decimal) 0.0, PaymentMethod.PIX, DateTime.Now, DateTime.Now, false, 1),
+            new(1, SubscriptionPlanType.FREE_TRIAL, startDate, endDate, true, (decimal) 0.0, PaymentMethod.PIX, createdAt, updatedAt, false, 1),
         });
     }
 }

@@ -22,9 +22,12 @@ public class DailyRecordBuilder
         modelBuilder.Entity<DailyRecord>().Property(dr => dr.EmployeeId).IsRequired();
         modelBuilder.Entity<DailyRecord>().Property(dr => dr.ReviewerId);
 
+        var date = new DateOnly(2025, 6, 20);
+        var reviewedAt = new DateTime(2025, 6, 21, 20, 30, 0, DateTimeKind.Utc);
+
         modelBuilder.Entity<DailyRecord>().HasData(new List<DailyRecord>
         {
-            new(1, new DateOnly(2025, 6, 20), 10, 8, 2, 0, false, ReviewStatus.APPROVED, "Aprovado", new DateTime(2025, 6, 21), 1, 1),
+            new(1, date, 10, 8, 2, 0, false, ReviewStatus.APPROVED, "Aprovado", reviewedAt, 2, 2, 1),
         });
     }
 }

@@ -28,7 +28,7 @@ public class WorkScheduleBuilder
         modelBuilder.Entity<WorkSchedule>().HasData(new List<WorkSchedule>
         {
             new(1, 30, "2025/04", ScheduleDayType.WORK_DAY, 1),
-            new(2, 31, "2025/04", ScheduleDayType.WORK_DAY, 1),
+            new(2, 31, "2025/04", ScheduleDayType.WORK_DAY, 2),
         });
     }
 }

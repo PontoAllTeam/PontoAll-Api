@@ -22,6 +22,7 @@ public class UserBuilder
         modelBuilder.Entity<User>().HasData(new List<User>
         {
             new(1, "Carlos", "12312312389", "12798798798", "carlos.gabriel@gmail.com", "carlin@outlook.com", "241251251", "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", UserType.DIRECTOR, UserStatus.ACTIVE, 1),
+            new(2, "Lucas", "23498712390", "23498712390", "lucas.monteiro@gmail.com", "monteiro@outlook.com", "241251252", "8d969eef6ecad3c29a3a629280e686cf0c3f5d5a86aff3ca12020c923adc6c92", UserType.MANAGER, UserStatus.ACTIVE, 1),
         });
     }
 }
