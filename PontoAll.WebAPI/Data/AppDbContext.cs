@@ -29,5 +29,6 @@ public class AppDbContext : DbContext
         DepartmentBuilder.Build(modelBuilder);
         SectorBuilder.Build(modelBuilder);
         TimeRecordBuilder.Build(modelBuilder);
+        SubscriptionPlanBuilder.Build(modelBuilder);
     }
 }
