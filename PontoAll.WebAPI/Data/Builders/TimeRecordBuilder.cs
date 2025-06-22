@@ -3,15 +3,16 @@ using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Data.Builders;
 
-public class MarkPointBuilder
+public class TimeRecordBuilder
 {
     public static void Build(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<MarkPoint>().HasKey(m => m.Id);
-        modelBuilder.Entity<MarkPoint>().Property(m => m.Date).IsRequired();
-        modelBuilder.Entity<MarkPoint>().Property(m => m.Time).IsRequired();
-        modelBuilder.Entity<MarkPoint>().Property(m => m.UserId).IsRequired();
-        modelBuilder.Entity<MarkPoint>().OwnsOne(m => m.Location, loc =>
+        modelBuilder.Entity<TimeRecord>().HasKey(m => m.Id);
+        modelBuilder.Entity<TimeRecord>().Property(m => m.Date).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(m => m.Time).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(m => m.Justification);
+        modelBuilder.Entity<TimeRecord>().Property(m => m.UserId).IsRequired();
+        modelBuilder.Entity<TimeRecord>().OwnsOne(m => m.Location, loc =>
         {
             loc.Property(l => l.Latitude)
                 .HasColumnName("latitude")

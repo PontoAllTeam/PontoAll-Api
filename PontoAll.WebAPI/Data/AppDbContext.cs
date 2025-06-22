@@ -8,22 +8,32 @@ public class AppDbContext : DbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-    public DbSet<Scale> Scales { get; set; }
+    public DbSet<WorkSchedule> WorkSchedules { get; set; }
     public DbSet<User> Users { get; set; }
     public DbSet<Company> Companies { get; set; }
     public DbSet<Department> Departments { get; set; }
     public DbSet<Sector> Sectors { get; set; }
-    public DbSet<MarkPoint> MarkPoints { get; set; }
+    public DbSet<TimeRecord> TimeRecords { get; set; }
+    public DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+    public DbSet<BiometricData> BiometricDatas { get; set; }
+    public DbSet<PermissionRequest> PermissionRequests { get; set; }
+    public DbSet<DailyRecord> DailyRecords { get; set; }
+    public DbSet<Geofence> Geofences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        ScaleBuilder.Build(modelBuilder);
+        WorkScheduleBuilder.Build(modelBuilder);
         CompanyBuilder.Build(modelBuilder);
         UserBuilder.Build(modelBuilder);
         DepartmentBuilder.Build(modelBuilder);
         SectorBuilder.Build(modelBuilder);
-        MarkPointBuilder.Build(modelBuilder);
+        TimeRecordBuilder.Build(modelBuilder);
+        SubscriptionPlanBuilder.Build(modelBuilder);
+        PermissionRequestBuilder.Build(modelBuilder);
+        DailyRecordBuilder.Build(modelBuilder);
+        BiometricDataBuilder.Build(modelBuilder);
+        GeofenceBuilder.Build(modelBuilder);
     }
 }
