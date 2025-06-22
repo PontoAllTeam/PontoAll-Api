@@ -16,8 +16,8 @@ public class UserBuilder
         modelBuilder.Entity<User>().Property(s => s.RecoveryEmail).IsRequired().HasMaxLength(100);
         modelBuilder.Entity<User>().Property(s => s.Registration).IsRequired().HasMaxLength(100);
         modelBuilder.Entity<User>().Property(s => s.Password).IsRequired().HasMaxLength(100);
-        modelBuilder.Entity<User>().Property(s => s.Type).IsRequired();
-        modelBuilder.Entity<User>().Property(s => s.Status).IsRequired();
+        modelBuilder.Entity<User>().Property(s => s.UserType).IsRequired();
+        modelBuilder.Entity<User>().Property(s => s.UserStatus).IsRequired();
 
         modelBuilder.Entity<User>().HasData(new List<User>
         {

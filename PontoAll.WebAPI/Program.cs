@@ -60,12 +60,12 @@ builder.Services.AddScoped<ISectorService, SectorService>();
 builder.Services.AddScoped<IMarkPointService, MarkPointService>();
 
 //Scoped Repositories and Interfaces
-builder.Services.AddScoped<IScaleRepository, ScaleRepository>();
+builder.Services.AddScoped<IWorkScheduleRepository, WorkScheduleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ISectorRepository, SectorRepository>();
-builder.Services.AddScoped<IMarkPointRepository, MarkPointRepository>();
+builder.Services.AddScoped<ITimeRecordRepository, TimeRecordRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>

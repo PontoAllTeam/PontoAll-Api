@@ -8,10 +8,10 @@ namespace PontoAll.WebAPI.Services.Entities;
 
 public class ScaleService : GenericService<WorkSchedule, WorkScheduleDTO>, IScaleService
 {
-    private readonly IScaleRepository _scaleRepository;
+    private readonly IWorkScheduleRepository _scaleRepository;
     private readonly IMapper _mapper;
 
-    public ScaleService(IScaleRepository repository, IMapper mapper) : base(repository, mapper)
+    public ScaleService(IWorkScheduleRepository repository, IMapper mapper) : base(repository, mapper)
     {
         _scaleRepository = repository;
         _mapper = mapper;

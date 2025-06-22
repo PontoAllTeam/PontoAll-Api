@@ -3,11 +3,11 @@ using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Data.Repositories;
 
-public class MarkPointRepository : GenericRepository<TimeRecord>, IMarkPointRepository
+public class TimeRecordRepository : GenericRepository<TimeRecord>, ITimeRecordRepository
 {
     private readonly AppDbContext _context;
 
-    public MarkPointRepository(AppDbContext context) : base(context)
+    public TimeRecordRepository(AppDbContext context) : base(context)
     {
         _context = context;
     }

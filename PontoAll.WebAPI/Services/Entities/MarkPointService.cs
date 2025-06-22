@@ -8,10 +8,10 @@ namespace PontoAll.WebAPI.Services.Entities;
 
 public class MarkPointService : GenericService<TimeRecord, TimeRecordDTO>, IMarkPointService
 {
-    private readonly IMarkPointRepository _markPointRepository;
+    private readonly ITimeRecordRepository _markPointRepository;
     private readonly IMapper _mapper;
 
-    public MarkPointService(IMarkPointRepository repository, IMapper mapper) : base(repository, mapper)
+    public MarkPointService(ITimeRecordRepository repository, IMapper mapper) : base(repository, mapper)
     {
         _markPointRepository = repository;
         _mapper = mapper;

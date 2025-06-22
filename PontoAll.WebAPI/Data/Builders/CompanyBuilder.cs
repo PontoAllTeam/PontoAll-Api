@@ -20,7 +20,7 @@ public class CompanyBuilder
         modelBuilder.Entity<Company>().Property(s => s.Street).IsRequired().HasMaxLength(100);
         modelBuilder.Entity<Company>().Property(s => s.Neighborhood).IsRequired().HasMaxLength(100);
         modelBuilder.Entity<Company>().Property(s => s.Number).IsRequired().HasMaxLength(5);
-        modelBuilder.Entity<Company>().Property(s => s.Status).IsRequired();
+        modelBuilder.Entity<Company>().Property(s => s.CompanyStatus).IsRequired();
 
         modelBuilder.Entity<Company>().HasData(new List<Company>
         {
