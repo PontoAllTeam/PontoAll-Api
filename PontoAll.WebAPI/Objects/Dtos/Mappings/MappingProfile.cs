@@ -17,5 +17,6 @@ public class MappingProfile : Profile
         CreateMap<SubscriptionPlanDTO, SubscriptionPlan>().ReverseMap();
         CreateMap<PermissionRequestDTO, PermissionRequest>().ReverseMap();
         CreateMap<BiometricDataDTO, BiometricData>().ReverseMap();
+        CreateMap<DailyRecordDTO, DailyRecord>().ReverseMap();
     }
 }
