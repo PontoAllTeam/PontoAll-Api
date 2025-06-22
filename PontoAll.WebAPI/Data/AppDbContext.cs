@@ -32,5 +32,6 @@ public class AppDbContext : DbContext
         SubscriptionPlanBuilder.Build(modelBuilder);
         PermissionRequestBuilder.Build(modelBuilder);
         DailyRecordBuilder.Build(modelBuilder);
+        BiometricDataBuilder.Build(modelBuilder);
     }
 }
