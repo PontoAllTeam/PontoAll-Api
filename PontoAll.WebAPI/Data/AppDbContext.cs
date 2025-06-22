@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<BiometricData> BiometricDatas { get; set; }
     public DbSet<PermissionRequest> PermissionRequests { get; set; }
     public DbSet<DailyRecord> DailyRecords { get; set; }
+    public DbSet<Geofence> Geofences { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -33,5 +34,6 @@ public class AppDbContext : DbContext
         PermissionRequestBuilder.Build(modelBuilder);
         DailyRecordBuilder.Build(modelBuilder);
         BiometricDataBuilder.Build(modelBuilder);
+        GeofenceBuilder.Build(modelBuilder);
     }
 }

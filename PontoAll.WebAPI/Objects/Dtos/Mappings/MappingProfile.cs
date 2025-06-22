@@ -18,5 +18,6 @@ public class MappingProfile : Profile
         CreateMap<PermissionRequestDTO, PermissionRequest>().ReverseMap();
         CreateMap<BiometricDataDTO, BiometricData>().ReverseMap();
         CreateMap<DailyRecordDTO, DailyRecord>().ReverseMap();
+        CreateMap<GeofenceDTO, Geofence>().ReverseMap();
     }
 }

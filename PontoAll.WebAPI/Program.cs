@@ -58,6 +58,7 @@ builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ISectorService, SectorService>();
 builder.Services.AddScoped<ITimeRecordService, TimeRecordService>();
+builder.Services.AddScoped<IGeofenceService, GeofenceService>();
 
 //Scoped Repositories and Interfaces
 builder.Services.AddScoped<IWorkScheduleRepository, WorkScheduleRepository>();
@@ -66,6 +67,7 @@ builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ISectorRepository, SectorRepository>();
 builder.Services.AddScoped<ITimeRecordRepository, TimeRecordRepository>();
+builder.Services.AddScoped<IGeofenceRepository, GeofenceRepository>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
