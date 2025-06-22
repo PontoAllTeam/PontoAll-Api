@@ -50,7 +50,7 @@ public class DailyRecord
 
     public DailyRecord() { }
 
-    public DailyRecord(int id, DateOnly date, double totalWorkedHours, double expectedHours, double overtimeHours, double missingHours, bool isAbsent, ReviewStatus reviewStatus, string? reviewerComments, DateTime? reviewedAt, int employeeId, int? reviewerId)
+    public DailyRecord(int id, DateOnly date, double totalWorkedHours, double expectedHours, double overtimeHours, double missingHours, bool isAbsent, ReviewStatus reviewStatus, string? reviewerComments, DateTime? reviewedAt, int workScheduleId, int employeeId, int? reviewerId)
     {
         Id = id;
         Date = date;
@@ -62,6 +62,7 @@ public class DailyRecord
         ReviewStatus = reviewStatus;
         ReviewerComments = reviewerComments;
         ReviewedAt = reviewedAt;
+        WorkScheduleId = workScheduleId;
         EmployeeId = employeeId;
         ReviewerId = reviewerId;
     }
