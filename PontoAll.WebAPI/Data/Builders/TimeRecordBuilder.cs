@@ -7,12 +7,13 @@ public class TimeRecordBuilder
 {
     public static void Build(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TimeRecord>().HasKey(m => m.Id);
-        modelBuilder.Entity<TimeRecord>().Property(m => m.Date).IsRequired();
-        modelBuilder.Entity<TimeRecord>().Property(m => m.Time).IsRequired();
-        modelBuilder.Entity<TimeRecord>().Property(m => m.Justification);
-        modelBuilder.Entity<TimeRecord>().Property(m => m.UserId).IsRequired();
-        modelBuilder.Entity<TimeRecord>().OwnsOne(m => m.Location, loc =>
+        modelBuilder.Entity<TimeRecord>().HasKey(tr => tr.Id);
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.Date).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.Time).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.Justification);
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.UserId).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.DailyRecordId).IsRequired();
+        modelBuilder.Entity<TimeRecord>().OwnsOne(tr => tr.Location, loc =>
         {
             loc.Property(l => l.Latitude)
                 .HasColumnName("latitude")

@@ -13,4 +13,5 @@ public class UserDTO
     public int Type { get; set; }
     public int Status { get; set; }
     public int CompanyId { get; set; }
+    public int SectorId { get; set; }
 }

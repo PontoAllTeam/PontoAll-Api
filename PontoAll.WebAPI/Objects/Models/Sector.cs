@@ -11,7 +11,7 @@ public class Sector
     [Column("name")] 
     public string Name { get; set; }
 
-    [Column("department")]
+    [Column("departmentid")]
     public int DepartmentId { get; set; }
     public Department Department { get; set; } = null!;
 

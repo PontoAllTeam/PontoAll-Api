@@ -40,8 +40,12 @@ public class User
     public int CompanyId { get; set; }
     public Company Company { get; set; } = null!;
 
+    [Column("sectorid")]
+    public int SectorId { get; set; }
+    public Sector Sector { get; set; } = null!;
+
     public User() { }
-    public User(int id, string name, string cpf, string phone, string email, string recoveryEmail, string registration, string password, UserType userType, UserStatus userStatus, int companyId)
+    public User(int id, string name, string cpf, string phone, string email, string recoveryEmail, string registration, string password, UserType userType, UserStatus userStatus, int companyId, int sectorId)
     {
         Id = id;
         Name = name;
@@ -54,5 +58,6 @@ public class User
         UserType = userType;
         UserStatus = userStatus;
         CompanyId = companyId;
+        SectorId = sectorId;
     }
 }

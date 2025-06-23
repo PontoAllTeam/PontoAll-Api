@@ -25,9 +25,13 @@ public class TimeRecord
     public int UserId { get; set; }
     public User User { get; set; } = null!;
 
+    [Column("dailyrecordid")]
+    public int DailyRecordId { get; set; }
+    public DailyRecord DailyRecord { get; set; } = null!;
+
     public TimeRecord() { }
 
-    public TimeRecord(int id, DateOnly date, TimeOnly time, Geolocation location, string? justification, int userId)
+    public TimeRecord(int id, DateOnly date, TimeOnly time, Geolocation location, string? justification, int userId, int dailyRecordId)
     {
         Id = id;
         Date = date;
@@ -35,5 +39,6 @@ public class TimeRecord
         Location = location;
         UserId = userId;
         Justification = justification;
+        DailyRecordId = dailyRecordId;
     }
 }

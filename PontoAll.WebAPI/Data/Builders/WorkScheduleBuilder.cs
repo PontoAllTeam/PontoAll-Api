@@ -8,22 +8,22 @@ public class WorkScheduleBuilder
 {
     public static void Build(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<WorkSchedule>().HasKey(s => s.Id);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.DayOfMonth).IsRequired();
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.YearMonth).IsRequired().HasMaxLength(7);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.DayType).IsRequired();
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.UserId).IsRequired();
+        modelBuilder.Entity<WorkSchedule>().HasKey(ws => ws.Id);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.DayOfMonth).IsRequired();
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.YearMonth).IsRequired().HasMaxLength(7);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.DayType).IsRequired();
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.UserId).IsRequired();
 
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime1);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime2);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime3);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime4);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime5);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime6);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime7);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime8);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime9);
-        modelBuilder.Entity<WorkSchedule>().Property(s => s.MarkTime10);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime1);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime2);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime3);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime4);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime5);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime6);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime7);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime8);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime9);
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime10);
 
         modelBuilder.Entity<WorkSchedule>().HasData(new List<WorkSchedule>
         {

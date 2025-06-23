@@ -11,4 +11,5 @@ public class TimeRecordDTO
     public string? Justification { get; set; }
     public int UserId { get; set; }
     public string Photo { get; set; }
+    public int DailyRecordId { get; set; }
 }
