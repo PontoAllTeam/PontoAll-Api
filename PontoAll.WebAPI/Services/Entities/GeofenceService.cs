@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using NuGet.Protocol.Core.Types;
 using PontoAll.WebAPI.Data.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
@@ -20,9 +21,9 @@ public class GeofenceService : GenericService<Geofence, GeofenceDTO>, IGeofenceS
 
     public async Task<bool> IsInsideGeofence(Geolocation point, int geofenceId)
     {
-        var geofenceDTO = await GetById(geofenceId) ?? throw new KeyNotFoundException("A cerca virtual requisitada não existe");
-        var geofencePoints = typeof(GeofenceDTO).GetProperties()
-            .Where(p => p.Name.StartsWith("Point"))
+        var geofence = await _geofenceRepository.GetById(geofenceId) ?? throw new KeyNotFoundException("A cerca virtual requisitada não existe");
+        var geofencePoints = typeof(Geofence).GetProperties()
+            .Where(p => p.Name.StartsWith("Point") && p.PropertyType == typeof(Geolocation))
             .OrderBy(p => p.Name)
             .ToList() ?? throw new KeyNotFoundException("Não foi possível encontrar os pontos da cerca virtual");
 
@@ -31,8 +32,8 @@ public class GeofenceService : GenericService<Geofence, GeofenceDTO>, IGeofenceS
 
         for (int i = 0; i < count; i++)
         {
-            var valueA = geofencePoints[i].GetValue(geofenceDTO);
-            var valueB = geofencePoints[(i + 1) % count].GetValue(geofenceDTO);
+            var valueA = geofencePoints[i].GetValue(geofence);
+            var valueB = geofencePoints[(i + 1) % count].GetValue(geofence);
 
             if (valueA is not Geolocation pointA || valueB is not Geolocation pointB) continue;
 

@@ -5,7 +5,6 @@ using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Services.Utils;
-using System.Drawing;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -189,17 +188,22 @@ public class GeofenceController : Controller
 
     private static void ValidateGeofencePoints(GeofenceDTO geofenceDTO)
     {
-        var geofencePoints = typeof(GeofenceDTO).GetProperties()
-            .Where(p => p.Name.StartsWith("Point"))
-            .OrderBy(p => p.Name)
-            .ToList();
+        var geofencePoints = new List<Geolocation>
+        {
+            new(geofenceDTO.Point1Lat, geofenceDTO.Point1Lon),
+            new(geofenceDTO.Point2Lat, geofenceDTO.Point2Lon),
+            new(geofenceDTO.Point3Lat, geofenceDTO.Point3Lon)
+        };
+
+        if (geofenceDTO.Point4Lat.HasValue && geofenceDTO.Point4Lon.HasValue)
+            geofencePoints.Add(new Geolocation(geofenceDTO.Point4Lat.Value, geofenceDTO.Point4Lon.Value));
+
+        if (geofenceDTO.Point5Lat.HasValue && geofenceDTO.Point5Lon.HasValue)
+            geofencePoints.Add(new Geolocation(geofenceDTO.Point5Lat.Value, geofenceDTO.Point5Lon.Value));
 
         for(int i = 0; i < geofencePoints.Count; i++)
         {
-            var point = geofencePoints[i];
-            var value = point.GetValue(geofenceDTO);
-
-            if (value is not Geolocation location) continue;
+            var location = geofencePoints[i];
 
             if (!GeolocationValidator.IsValidGeolocation(location))
             {
