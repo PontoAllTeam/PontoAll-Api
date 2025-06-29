@@ -68,6 +68,7 @@ public class DepartmentController : Controller
 
         try
         {
+            departmentDTO.Id = 0;
             await _departmentService.Create(departmentDTO);
 
             _response.Code = ResponseEnum.SUCCESS;

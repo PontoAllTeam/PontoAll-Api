@@ -52,17 +52,22 @@ public class WorkSchedule
     public int UserId { get; set; }
     public User User { get; set; } = null!;
 
+    [Column("geofenceid")]
+    public int GeofenceId { get; set; }
+    public Geofence Geofence { get; set; } = null!;
+
     public WorkSchedule()
     {
 
     }
 
-    public WorkSchedule(int id, int dayOfMonth, string yearMonth, ScheduleDayType dayType, int userId)
+    public WorkSchedule(int id, int dayOfMonth, string yearMonth, ScheduleDayType dayType, int userId, int geofenceId)
     {
         Id = id;
         DayOfMonth = dayOfMonth;
         YearMonth = yearMonth;
         DayType = dayType;
         UserId = userId;
+        GeofenceId = geofenceId;
     }
 }

@@ -69,33 +69,11 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
-        // Validação de CPF ou CNPJ
-        var cpfCnpjNumbers = StringUtils.ExtractNumbers(userDTO.Cpf);
-        if (cpfCnpjNumbers.Length == 11)
-        {
-            if (!CpfCnpjValidator.IsValidCPF(userDTO.Cpf))
-            {
-                _response.Code = ResponseEnum.INVALID;
-                _response.Data = null;
-                _response.Message = "CPF inválido";
-                return BadRequest(_response);
-            }
-        }
-        else if (cpfCnpjNumbers.Length == 14)
-        {
-            if (!CpfCnpjValidator.IsValidCNPJ(userDTO.Cpf))
-            {
-                _response.Code = ResponseEnum.INVALID;
-                _response.Data = null;
-                _response.Message = "CNPJ inválido";
-                return BadRequest(_response);
-            }
-        }
-        else
+        if (!CpfCnpjValidator.IsValidCPF(userDTO.Cpf))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
-            _response.Message = "CPF ou CNPJ inválido";
+            _response.Message = "CPF inválido";
             return BadRequest(_response);
         }
 

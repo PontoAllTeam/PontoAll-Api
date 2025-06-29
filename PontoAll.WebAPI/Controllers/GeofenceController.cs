@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
+using PontoAll.WebAPI.Services.Utils;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -68,6 +69,9 @@ public class GeofenceController : Controller
 
         try
         {
+            ValidateGeofencePoints(geofenceDTO);
+
+            geofenceDTO.Id = 0;
             await _geofenceService.Create(geofenceDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
@@ -76,6 +80,13 @@ public class GeofenceController : Controller
 
             return Ok(_response);
         }
+        catch (FormatException ex)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = ex.Message;
+            _response.Data = null;
+            return BadRequest(_response);
+        }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
@@ -112,6 +123,8 @@ public class GeofenceController : Controller
                 return NotFound(_response);
             }
 
+            ValidateGeofencePoints(geofenceDTO);
+
             await _geofenceService.Update(geofenceDTO, id);
 
             _response.Code = ResponseEnum.SUCCESS;
@@ -120,6 +133,13 @@ public class GeofenceController : Controller
 
             return Ok(_response);
         }
+        catch (FormatException ex)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = ex.Message;
+            _response.Data = null;
+            return BadRequest(_response);
+        }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
@@ -167,4 +187,30 @@ public class GeofenceController : Controller
             return StatusCode(StatusCodes.Status500InternalServerError, _response);
         }
     }
+
+    private static void ValidateGeofencePoints(GeofenceDTO geofenceDTO)
+    {
+        var geofencePoints = new List<Geolocation>
+        {
+            new(geofenceDTO.Point1Lat, geofenceDTO.Point1Lon),
+            new(geofenceDTO.Point2Lat, geofenceDTO.Point2Lon),
+            new(geofenceDTO.Point3Lat, geofenceDTO.Point3Lon)
+        };
+
+        if (geofenceDTO.Point4Lat.HasValue && geofenceDTO.Point4Lon.HasValue)
+            geofencePoints.Add(new Geolocation(geofenceDTO.Point4Lat.Value, geofenceDTO.Point4Lon.Value));
+
+        if (geofenceDTO.Point5Lat.HasValue && geofenceDTO.Point5Lon.HasValue)
+            geofencePoints.Add(new Geolocation(geofenceDTO.Point5Lat.Value, geofenceDTO.Point5Lon.Value));
+
+        for(int i = 0; i < geofencePoints.Count; i++)
+        {
+            var location = geofencePoints[i];
+
+            if (!GeolocationValidator.IsValidGeolocation(location))
+            {
+                throw new FormatException($"Formato da coordenada do ponto {i + 1} incorreto");
+            }
+        }
+    }
 }

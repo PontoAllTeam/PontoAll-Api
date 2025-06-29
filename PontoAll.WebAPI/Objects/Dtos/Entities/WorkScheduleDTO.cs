@@ -17,4 +17,5 @@ public class WorkScheduleDTO
     public string? MarkTime9 { get; set; }
     public string? MarkTime10 { get; set; }
     public int UserId { get; set; }
+    public int GeofenceId { get; set; }
 }

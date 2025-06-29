@@ -10,23 +10,19 @@ public class TimeRecordBuilder
         modelBuilder.Entity<TimeRecord>().HasKey(tr => tr.Id);
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.Date).IsRequired();
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.Time).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.Latitude).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.Longitude).IsRequired();
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.Justification);
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.UserId).IsRequired();
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.DailyRecordId).IsRequired();
-        modelBuilder.Entity<TimeRecord>().OwnsOne(tr => tr.Location, loc =>
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.WorkScheduleId).IsRequired();
+
+        var date = new DateOnly(2025, 6, 10);
+        var time = new TimeOnly(20, 30);
+
+        modelBuilder.Entity<TimeRecord>().HasData(new List<TimeRecord>
         {
-            loc.Property(l => l.Latitude)
-                .HasColumnName("latitude")
-                .IsRequired();
-
-            loc.Property(l => l.Longitude)
-                .HasColumnName("longitude")
-                .IsRequired();
+            new(1, date, time, 10.15, 10.15, null, 1, 1, 1),
         });
-
-        /*
-         * Não é possível adicionar dados iniciais aqui porque o EF Core não aceita
-         * tipos complexos como Geolocation para esse tipo de operação.
-         */
     }
 }

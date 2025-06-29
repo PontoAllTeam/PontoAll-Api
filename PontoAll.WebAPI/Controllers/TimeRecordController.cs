@@ -14,11 +14,15 @@ namespace PontoAll.WebAPI.Controllers;
 public class TimeRecordController : Controller
 {
     private readonly ITimeRecordService _timeRecordService;
+    private readonly IWorkScheduleService _workScheduleService;
+    private readonly IGeofenceService _geofenceService;
     private readonly Response _response;
 
-    public TimeRecordController(ITimeRecordService timeRecordService)
+    public TimeRecordController(ITimeRecordService timeRecordService, IWorkScheduleService workScheduleService, IGeofenceService geofenceService)
     {
         _timeRecordService = timeRecordService;
+        _workScheduleService = workScheduleService;
+        _geofenceService = geofenceService;
         _response = new Response();
     }
 
@@ -78,7 +82,20 @@ public class TimeRecordController : Controller
 
         try
         {
-            await _timeRecordService.Create(timeRecordDTO);
+            var workSchedule = await _workScheduleService.GetById(timeRecordDTO.WorkScheduleId) ?? throw new KeyNotFoundException("Escala não encontrada");
+            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Location, workSchedule.GeofenceId);
+            
+            if (!isInsideGeofence)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "Localização atual não corresponde à área permitida";
+
+                return BadRequest(_response);
+            }
+
+            timeRecordDTO.Id = 0;
+            await _timeRecordService.Create(timeRecordDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = timeRecordDTO;
