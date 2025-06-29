@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
+using PontoAll.WebAPI.Services.Utils;
+using System.Drawing;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -68,6 +70,7 @@ public class GeofenceController : Controller
 
         try
         {
+            ValidateGeofencePoints(geofenceDTO);
             await _geofenceService.Create(geofenceDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
@@ -76,6 +79,13 @@ public class GeofenceController : Controller
 
             return Ok(_response);
         }
+        catch (FormatException ex)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = ex.Message;
+            _response.Data = null;
+            return BadRequest(_response);
+        }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
@@ -112,6 +122,8 @@ public class GeofenceController : Controller
                 return NotFound(_response);
             }
 
+            ValidateGeofencePoints(geofenceDTO);
+
             await _geofenceService.Update(geofenceDTO, id);
 
             _response.Code = ResponseEnum.SUCCESS;
@@ -120,6 +132,13 @@ public class GeofenceController : Controller
 
             return Ok(_response);
         }
+        catch (FormatException ex)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Message = ex.Message;
+            _response.Data = null;
+            return BadRequest(_response);
+        }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
@@ -167,4 +186,25 @@ public class GeofenceController : Controller
             return StatusCode(StatusCodes.Status500InternalServerError, _response);
         }
     }
+
+    private static void ValidateGeofencePoints(GeofenceDTO geofenceDTO)
+    {
+        var geofencePoints = typeof(GeofenceDTO).GetProperties()
+            .Where(p => p.Name.StartsWith("Point"))
+            .OrderBy(p => p.Name)
+            .ToList();
+
+        for(int i = 0; i < geofencePoints.Count; i++)
+        {
+            var point = geofencePoints[i];
+            var value = point.GetValue(geofenceDTO);
+
+            if (value is not Geolocation location) continue;
+
+            if (!GeolocationValidator.IsValidGeolocation(location))
+            {
+                throw new FormatException($"Formato da coordenada do ponto {i + 1} incorreto");
+            }
+        }
+    }
 }
