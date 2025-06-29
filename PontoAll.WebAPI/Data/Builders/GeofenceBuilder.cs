@@ -22,10 +22,6 @@ public class GeofenceBuilder
         modelBuilder.Entity<Geofence>().Property(g => g.Point5Lat);
         modelBuilder.Entity<Geofence>().Property(g => g.Point5Lon);
 
-        /*
-         * Não é possível adicionar dados iniciais aqui porque o EF Core não aceita
-         * tipos complexos como Geolocation para esse tipo de operação.
-         */
         modelBuilder.Entity<Geofence>().HasData(new List<Geofence>
         {
             new(1, "Pátio 1", 10.0, 10.0, 10.1, 10.1, 10.2, 10.0, null, null, null, null, 1),

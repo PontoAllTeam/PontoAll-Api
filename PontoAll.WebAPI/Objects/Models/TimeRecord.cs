@@ -15,8 +15,14 @@ public class TimeRecord
     [Column("time")]
     public TimeOnly Time { get; set; }
 
-    [Column("location")]
-    public Geolocation Location { get; set; }
+    [Column("latitude")]
+    public double Latitude { get; set; }
+
+    [Column("longitude")]
+    public double Longitude { get; set; }
+
+    [NotMapped]
+    public Geolocation Location => new(Latitude, Longitude);
 
     [Column("justification")]
     public string? Justification { get; set; }
@@ -35,12 +41,13 @@ public class TimeRecord
 
     public TimeRecord() { }
 
-    public TimeRecord(int id, DateOnly date, TimeOnly time, Geolocation location, string? justification, int userId, int dailyRecordId, int workScheduleId)
+    public TimeRecord(int id, DateOnly date, TimeOnly time, double latitude, double longitude, string? justification, int userId, int dailyRecordId, int workScheduleId)
     {
         Id = id;
         Date = date;
         Time = time;
-        Location = location;
+        Latitude = latitude;
+        Longitude = longitude;
         UserId = userId;
         Justification = justification;
         DailyRecordId = dailyRecordId;
