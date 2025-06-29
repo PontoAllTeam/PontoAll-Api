@@ -11,24 +11,24 @@ namespace PontoAll.WebAPI.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class ScaleController : Controller
+public class WorkScheduleController : Controller
 {
-    private readonly IScaleService _scaleService;
+    private readonly IWorkScheduleService _workScheduleService;
     private readonly Response _response;
 
-    public ScaleController(IScaleService scaleService)
+    public WorkScheduleController(IWorkScheduleService workScheduleService)
     {
-        _scaleService = scaleService;
+        _workScheduleService = workScheduleService;
         _response = new Response();
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var scalesDTO = await _scaleService.GetAll();
+        var workSchedulesDTO = await _workScheduleService.GetAll();
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = scalesDTO;
+        _response.Data = workSchedulesDTO;
         _response.Message = "Escalas listadas com sucesso";
 
         return Ok(_response);
@@ -37,52 +37,42 @@ public class ScaleController : Controller
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var scaleDTO = await _scaleService.GetById(id);
+        var workScheduleDTO = await _workScheduleService.GetById(id);
 
-        if (scaleDTO is null)
+        if (workScheduleDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
             _response.Data = null;
-            _response.Message = "Escala n„o encontrada";
+            _response.Message = "Escala n√£o encontrada";
 
             return NotFound(_response);
         }
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = scaleDTO;
+        _response.Data = workScheduleDTO;
         _response.Message = "Escala listada com sucesso";
 
         return Ok(_response);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post([FromBody] ScaleDTO scaleDTO)
+    public async Task<IActionResult> Post(WorkScheduleDTO workScheduleDTO)
     {
-        if (scaleDTO is null)
+        if (workScheduleDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
-            _response.Message = "Dados inv·lidos";
-            return BadRequest(_response);
+            _response.Message = "Dados inv√°lidos";
         }
 
         try
         {
-            ValidateScale(scaleDTO);
+            ValidateWorkSchedule(workScheduleDTO);
 
-            var existingScale = await _scaleService.GetById(scaleDTO.Id);
-            if (existingScale != null)
-            {
-                _response.Code = ResponseEnum.INVALID;
-                _response.Data = null;
-                _response.Message = "ID j· cadastrado.";
-                return BadRequest(_response);
-            }
-
-            await _scaleService.Create(scaleDTO);
+            await _workScheduleService.Create(workScheduleDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = scaleDTO;
+            _response.Data = workScheduleDTO;
             _response.Message = "Escala cadastrada com sucesso";
 
             return Ok(_response);
@@ -101,41 +91,40 @@ public class ScaleController : Controller
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, [FromBody] ScaleDTO scaleDTO)
+    public async Task<IActionResult> Put(int id, WorkScheduleDTO workScheduleDTO)
     {
-        if (scaleDTO is null)
+        if (workScheduleDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
-            _response.Message = "Dados inv·lidos";
-            return BadRequest(_response);
+            _response.Message = "Dados inv√°lidos";
         }
 
         try
         {
-            ValidateScale(scaleDTO);
+            ValidateWorkSchedule(workScheduleDTO);
 
-            var existingScaleDTO = await _scaleService.GetById(id);
-            if (existingScaleDTO is null)
+            var existingWorkScheduleDTO = await _workScheduleService.GetById(id);
+            if (existingWorkScheduleDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
-                _response.Message = "A escala informada n„o existe";
+                _response.Message = "A escala informada n√£o existe";
                 return NotFound(_response);
             }
 
-            if (id != scaleDTO.Id)
+            if (id != workScheduleDTO.Id)
             {
                 _response.Code = ResponseEnum.INVALID;
                 _response.Data = null;
-                _response.Message = "O ID da URL n„o corresponde ao ID do corpo da requisiÁ„o.";
+                _response.Message = "O ID da URL n√£o corresponde ao ID do corpo da requisi√ß√£o.";
                 return BadRequest(_response);
             }
 
-            await _scaleService.Update(scaleDTO, id);
+            await _workScheduleService.Update(workScheduleDTO, id);
 
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = scaleDTO;
+            _response.Data = workScheduleDTO;
             _response.Message = "Escala atualizada com sucesso";
 
             return Ok(_response);
@@ -153,22 +142,21 @@ public class ScaleController : Controller
         }
     }
 
-
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         try
         {
-            var existingScaleDTO = await _scaleService.GetById(id);
-            if (existingScaleDTO is null)
+            var existingWorkScheduleDTO = await _workScheduleService.GetById(id);
+            if (existingWorkScheduleDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
-                _response.Message = "A escala informada n„o existe";
+                _response.Message = "A escala informada n√£o existe";
                 return NotFound(_response);
             }
 
-            await _scaleService.Remove(id);
+            await _workScheduleService.Remove(id);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = null;
@@ -189,20 +177,20 @@ public class ScaleController : Controller
         }
     }
 
-    private void ValidateScale(ScaleDTO scaleDTO)
+    private void ValidateWorkSchedule(WorkScheduleDTO workScheduleDTO)
     {
-        if (scaleDTO.Day < 1 || scaleDTO.Day > 31)
-            throw new Exception("Dia inv·lido.");
+        if (workScheduleDTO.DayOfMonth < 1 || workScheduleDTO.DayOfMonth > 31)
+            throw new Exception("Dia inv√°lido.");
 
-        if (!DateValidator.IsValidMonth(scaleDTO.YearMonth))
-            throw new Exception("Ano/mÍs inv·lido.");
+        if (!DateValidator.IsValidMonth(workScheduleDTO.YearMonth))
+            throw new Exception("Ano/m√™s inv√°lido.");
 
-        if (scaleDTO.DayType < 1 || scaleDTO.DayType > 7)
-            throw new Exception("Dia da semana inv·lido.");
+        if (workScheduleDTO.DayType < 1 || workScheduleDTO.DayType > 7)
+            throw new Exception("Dia da semana inv√°lido.");
 
-        // ValidaÁ„o apenas do formato de cada campo de hor·rio
-        var pickProperties = typeof(ScaleDTO).GetProperties()
-            .Where(p => p.Name.StartsWith("Pick"))
+        // Valida√ß√£o apenas do formato de cada campo de hor√°rio
+        var pickProperties = typeof(WorkScheduleDTO).GetProperties()
+            .Where(p => p.Name.StartsWith("MarkTime"))
             .OrderBy(p => p.Name)
             .ToList();
 
@@ -210,7 +198,7 @@ public class ScaleController : Controller
 
         foreach (var prop in pickProperties)
         {
-            var value = prop.GetValue(scaleDTO);
+            var value = prop.GetValue(workScheduleDTO);
 
             TimeValidator.ValidateTime(value, prop.Name);
 
@@ -218,7 +206,7 @@ public class ScaleController : Controller
             {
                 if (previous.HasValue && current < previous)
                 {
-                    throw new Exception($"{prop.Name} deve ser maior ou igual ao hor·rio anterior.");
+                    throw new Exception($"{prop.Name} deve ser maior ou igual ao horÔøΩrio anterior.");
                 }
                 previous = current;
             }
@@ -226,7 +214,7 @@ public class ScaleController : Controller
             {
                 if (previous.HasValue && currentTime < previous)
                 {
-                    throw new Exception($"{prop.Name} deve ser maior ou igual ao hor·rio anterior.");
+                    throw new Exception($"{prop.Name} deve ser maior ou igual ao horÔøΩrio anterior.");
                 }
                 previous = currentTime;
             }

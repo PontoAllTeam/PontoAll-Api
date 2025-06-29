@@ -42,15 +42,13 @@ public class Company
     [Column("number")]
     public int Number { get; set; }
 
-    [Column("status")]
-    public CompanyStatus Status { get; set; }
+    [Column("companystatus")]
+    public CompanyStatus CompanyStatus { get; set; }
 
     public ICollection<User> Users { get; } = [];
+    public ICollection<Geofence> Geofences { get; } = [];
 
-    public Company()
-    {
-
-    }
+    public Company() { }
 
     public Company(int id, string corporateName, string fantasyname, string cnpj, string email, string businessphone, string state, string city, string cep, string street, string neighborhood, int number, CompanyStatus status)
     {
@@ -66,6 +64,6 @@ public class Company
         Street = street;
         Neighborhood = neighborhood;
         Number = number;
-        Status = status;
+        CompanyStatus = status;
     }
 }

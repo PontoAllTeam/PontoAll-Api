@@ -6,14 +6,14 @@ using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Services.Entities;
 
-public class MarkPointService : GenericService<MarkPoint, MarkPointDTO>, IMarkPointService
+public class GeofenceService : GenericService<Geofence, GeofenceDTO>, IGeofenceService
 {
-    private readonly IMarkPointRepository _markPointRepository;
+    private readonly IGeofenceRepository _geofenceRepository;
     private readonly IMapper _mapper;
 
-    public MarkPointService(IMarkPointRepository repository, IMapper mapper) : base(repository, mapper)
+    public GeofenceService(IGeofenceRepository repository, IMapper mapper) : base(repository, mapper)
     {
-        _markPointRepository = repository;
+        _geofenceRepository = repository;
         _mapper = mapper;
     }
 }

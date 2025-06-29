@@ -1,7 +1,4 @@
-﻿using PontoAll.WebAPI.Objects.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace PontoAll.WebAPI.Objects.Dtos.Entities;
+﻿namespace PontoAll.WebAPI.Objects.Dtos.Entities;
 
 public class UserDTO
 {
@@ -16,4 +13,5 @@ public class UserDTO
     public int Type { get; set; }
     public int Status { get; set; }
     public int CompanyId { get; set; }
+    public int SectorId { get; set; }
 }

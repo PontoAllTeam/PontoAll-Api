@@ -1,7 +1,4 @@
-﻿using PontoAll.WebAPI.Objects.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace PontoAll.WebAPI.Objects.Dtos.Entities;
+﻿namespace PontoAll.WebAPI.Objects.Dtos.Entities;
 
 public class CompanyDTO
 {
@@ -17,5 +14,5 @@ public class CompanyDTO
     public string Street { get; set; }
     public string Neighborhood { get; set; }
     public int Number { get; set; }
-    public int Status { get; set; }
+    public int CompanyStatus { get; set; }
 }
