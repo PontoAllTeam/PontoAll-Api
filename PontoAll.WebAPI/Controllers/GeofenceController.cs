@@ -70,6 +70,8 @@ public class GeofenceController : Controller
         try
         {
             ValidateGeofencePoints(geofenceDTO);
+
+            geofenceDTO.Id = 0;
             await _geofenceService.Create(geofenceDTO);
 
             _response.Code = ResponseEnum.SUCCESS;

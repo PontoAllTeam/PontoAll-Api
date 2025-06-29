@@ -98,6 +98,7 @@ public class CompanyController : Controller
                 return BadRequest(_response);
             }
 
+            companyDTO.Id = 0;
             await _companyService.Create(companyDTO);
 
             _response.Code = ResponseEnum.SUCCESS;

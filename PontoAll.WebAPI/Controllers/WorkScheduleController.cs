@@ -63,12 +63,15 @@ public class WorkScheduleController : Controller
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Dados inválidos";
+
+            return BadRequest(_response);
         }
 
         try
         {
             ValidateWorkSchedule(workScheduleDTO);
 
+            workScheduleDTO.Id = 0;
             await _workScheduleService.Create(workScheduleDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
@@ -98,6 +101,8 @@ public class WorkScheduleController : Controller
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Dados inválidos";
+
+            return BadRequest(_response);
         }
 
         try

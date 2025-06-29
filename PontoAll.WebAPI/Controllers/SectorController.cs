@@ -68,6 +68,7 @@ public class SectorController : Controller
 
         try
         {
+            sectorDTO.Id = 0;
             await _sectorService.Create(sectorDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
