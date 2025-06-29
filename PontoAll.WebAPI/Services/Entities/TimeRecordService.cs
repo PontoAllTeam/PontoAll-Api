@@ -6,14 +6,14 @@ using PontoAll.WebAPI.Services.Interfaces;
 
 namespace PontoAll.WebAPI.Services.Entities;
 
-public class MarkPointService : GenericService<MarkPoint, MarkPointDTO>, IMarkPointService
+public class TimeRecordService : GenericService<TimeRecord, TimeRecordDTO>, ITimeRecordService
 {
-    private readonly IMarkPointRepository _markPointRepository;
+    private readonly ITimeRecordRepository _timeRecordRepository;
     private readonly IMapper _mapper;
 
-    public MarkPointService(IMarkPointRepository repository, IMapper mapper) : base(repository, mapper)
+    public TimeRecordService(ITimeRecordRepository repository, IMapper mapper) : base(repository, mapper)
     {
-        _markPointRepository = repository;
+        _timeRecordRepository = repository;
         _mapper = mapper;
     }
 }

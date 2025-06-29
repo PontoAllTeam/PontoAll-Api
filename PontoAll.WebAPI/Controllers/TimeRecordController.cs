@@ -11,33 +11,39 @@ namespace PontoAll.WebAPI.Controllers;
 [ApiController]
 [Route("api/v1/[controller]")]
 [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-public class MarkPointController : Controller
+public class TimeRecordController : Controller
 {
-    private readonly IMarkPointService _markPointService;
+    private readonly ITimeRecordService _timeRecordService;
+    private readonly IWorkScheduleService _workScheduleService;
+    private readonly IGeofenceService _geofenceService;
     private readonly Response _response;
 
-    public MarkPointController(IMarkPointService markPointService)
+    public TimeRecordController(ITimeRecordService timeRecordService, IWorkScheduleService workScheduleService, IGeofenceService geofenceService)
     {
-        _markPointService = markPointService;
+        _timeRecordService = timeRecordService;
+        _workScheduleService = workScheduleService;
+        _geofenceService = geofenceService;
         _response = new Response();
     }
+
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var markPointsDTO = await _markPointService.GetAll();
+        var timeRecordsDTO = await _timeRecordService.GetAll();
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = markPointsDTO;
+        _response.Data = timeRecordsDTO;
         _response.Message = "Marcações de ponto listadas com sucesso";
 
         return Ok(_response);
     }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-        var markPointDTO = await _markPointService.GetById(id);
+        var timeRecordDTO = await _timeRecordService.GetById(id);
 
-        if (markPointDTO is null)
+        if (timeRecordDTO is null)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
             _response.Data = null;
@@ -47,16 +53,16 @@ public class MarkPointController : Controller
         }
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = markPointDTO;
+        _response.Data = timeRecordDTO;
         _response.Message = "Marcação de ponto listada com sucesso";
 
         return Ok(_response);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Post(MarkPointDTO markPointDTO)
+    public async Task<IActionResult> Post(TimeRecordDTO timeRecordDTO)
     {
-        if (markPointDTO is null)
+        if (timeRecordDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
@@ -65,7 +71,7 @@ public class MarkPointController : Controller
             return BadRequest(_response);
         }
 
-        if (!GeolocationValidator.IsValidGeolocation(markPointDTO.Location))
+        if (!GeolocationValidator.IsValidGeolocation(timeRecordDTO.Location))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
@@ -76,10 +82,23 @@ public class MarkPointController : Controller
 
         try
         {
-            await _markPointService.Create(markPointDTO);
+            var workSchedule = await _workScheduleService.GetById(timeRecordDTO.WorkScheduleId) ?? throw new KeyNotFoundException("Escala não encontrada");
+            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Location, workSchedule.GeofenceId);
+            
+            if (!isInsideGeofence)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "Localização atual não corresponde à área permitida";
+
+                return BadRequest(_response);
+            }
+
+            timeRecordDTO.Id = 0;
+            await _timeRecordService.Create(timeRecordDTO);
 
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = markPointDTO;
+            _response.Data = timeRecordDTO;
             _response.Message = "Marcação de ponto cadastrada com sucesso";
 
             return Ok(_response);
@@ -98,9 +117,9 @@ public class MarkPointController : Controller
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Put(int id, MarkPointDTO markPointDTO)
+    public async Task<IActionResult> Put(int id, TimeRecordDTO timeRecordDTO)
     {
-        if (markPointDTO is null)
+        if (timeRecordDTO is null)
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
@@ -109,7 +128,7 @@ public class MarkPointController : Controller
             return BadRequest(_response);
         }
 
-        if (!GeolocationValidator.IsValidGeolocation(markPointDTO.Location))
+        if (!GeolocationValidator.IsValidGeolocation(timeRecordDTO.Location))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
@@ -120,8 +139,8 @@ public class MarkPointController : Controller
 
         try
         {
-            var existingMarkPointDTO = await _markPointService.GetById(id);
-            if (existingMarkPointDTO is null)
+            var existingTimeRecordDTO = await _timeRecordService.GetById(id);
+            if (existingTimeRecordDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
@@ -129,10 +148,10 @@ public class MarkPointController : Controller
                 return NotFound(_response);
             }
 
-            await _markPointService.Update(markPointDTO, id);
+            await _timeRecordService.Update(timeRecordDTO, id);
 
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = markPointDTO;
+            _response.Data = timeRecordDTO;
             _response.Message = "Marcação de ponto atualizada com sucesso";
 
             return Ok(_response);
@@ -155,8 +174,8 @@ public class MarkPointController : Controller
     {
         try
         {
-            var existingMarkPointDTO = await _markPointService.GetById(id);
-            if (existingMarkPointDTO is null)
+            var existingTimeRecordDTO = await _timeRecordService.GetById(id);
+            if (existingTimeRecordDTO is null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
@@ -164,7 +183,7 @@ public class MarkPointController : Controller
                 return NotFound(_response);
             }
 
-            await _markPointService.Remove(id);
+            await _timeRecordService.Remove(id);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = null;

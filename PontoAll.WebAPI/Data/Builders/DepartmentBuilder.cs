@@ -8,6 +8,7 @@ public class DepartmentBuilder
     {
         modelBuilder.Entity<Department>().HasKey(s => s.Id);
         modelBuilder.Entity<Department>().Property(s => s.Name).IsRequired().HasMaxLength(100);
+        modelBuilder.Entity<Department>().Property(s => s.CompanyId).IsRequired();
 
         modelBuilder.Entity<Department>().HasData(new List<Department>
         {
