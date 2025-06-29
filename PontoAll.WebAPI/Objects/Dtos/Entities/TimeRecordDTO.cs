@@ -12,4 +12,5 @@ public class TimeRecordDTO
     public int UserId { get; set; }
     public string Photo { get; set; }
     public int DailyRecordId { get; set; }
+    public int WorkScheduleId { get; set; }
 }

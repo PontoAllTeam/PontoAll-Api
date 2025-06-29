@@ -13,6 +13,7 @@ public class WorkScheduleBuilder
         modelBuilder.Entity<WorkSchedule>().Property(ws => ws.YearMonth).IsRequired().HasMaxLength(7);
         modelBuilder.Entity<WorkSchedule>().Property(ws => ws.DayType).IsRequired();
         modelBuilder.Entity<WorkSchedule>().Property(ws => ws.UserId).IsRequired();
+        modelBuilder.Entity<WorkSchedule>().Property(ws => ws.GeofenceId).IsRequired();
 
         modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime1);
         modelBuilder.Entity<WorkSchedule>().Property(ws => ws.MarkTime2);
@@ -27,8 +28,8 @@ public class WorkScheduleBuilder
 
         modelBuilder.Entity<WorkSchedule>().HasData(new List<WorkSchedule>
         {
-            new(1, 30, "2025/04", ScheduleDayType.WORK_DAY, 1),
-            new(2, 31, "2025/04", ScheduleDayType.WORK_DAY, 2),
+            new(1, 30, "2025/04", ScheduleDayType.WORK_DAY, 1, 1),
+            new(2, 31, "2025/04", ScheduleDayType.WORK_DAY, 2, 1),
         });
     }
 }

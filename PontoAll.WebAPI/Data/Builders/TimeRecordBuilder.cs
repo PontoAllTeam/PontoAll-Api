@@ -13,6 +13,7 @@ public class TimeRecordBuilder
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.Justification);
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.UserId).IsRequired();
         modelBuilder.Entity<TimeRecord>().Property(tr => tr.DailyRecordId).IsRequired();
+        modelBuilder.Entity<TimeRecord>().Property(tr => tr.WorkScheduleId).IsRequired();
         modelBuilder.Entity<TimeRecord>().OwnsOne(tr => tr.Location, loc =>
         {
             loc.Property(l => l.Latitude)
