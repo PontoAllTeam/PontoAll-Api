@@ -5,5 +5,5 @@ namespace PontoAll.WebAPI.Services.Interfaces;
 
 public interface ICompanyService : IGenericService<Company, CompanyDTO>
 {
-
+     
 }

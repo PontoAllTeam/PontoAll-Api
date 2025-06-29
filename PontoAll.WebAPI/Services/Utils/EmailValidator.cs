@@ -1,10 +1,13 @@
 namespace PontoAll.WebAPI.Services.Utils;
 
-public class EmailValidator
+public static class EmailValidator
 {
     public static bool IsValidEmail(string email)
     {
+        if(string.IsNullOrWhiteSpace(email)) { return false; }
+
         int atPosition = email.IndexOf('@');
+
 
         bool hasTextBeforeAt = atPosition > 0;
         bool hasTextAfterAt = atPosition >= 0 && email.LastIndexOf('@') < email.Length - 1;
