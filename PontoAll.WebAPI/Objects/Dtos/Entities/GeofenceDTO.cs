@@ -4,7 +4,7 @@ public class GeofenceDTO
 {
     public int Id { get; set; }
     public string Name { get; set; }
-
+    public int CompanyId { get; set; }
     public double Point1Lat { get; set; }
     public double Point1Lon { get; set; }
 
