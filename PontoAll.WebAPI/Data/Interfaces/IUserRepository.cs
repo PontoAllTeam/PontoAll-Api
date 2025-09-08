@@ -9,4 +9,6 @@ public interface IUserRepository : IGenericRepository<User>
     Task<User> GetByEmail(string email);
     Task<User> Login(Login login);
     Task<User> GetByCPF(string Cpf);
+    Task<List<User>> GetByDepartmentId(int departmentId);
+    Task<List<User>> GetBySectorId(int sectorId);
 }

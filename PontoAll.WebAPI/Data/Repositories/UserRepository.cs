@@ -27,4 +27,13 @@ public class UserRepository : GenericRepository<User>, IUserRepository
     {
         return await _context.Users.FirstOrDefaultAsync(u => u.Cpf == cpf);
     }
+    public async Task<List<User>> GetByDepartmentId(int departmentId)
+    {
+        var sectorIds = await _context.Sectors.Where(s => s.DepartmentId == departmentId).Select(s => s.Id).ToListAsync();
+        return await _context.Users.Where(u => sectorIds.Contains(u.SectorId)).ToListAsync();
+    }
+    public async Task<List<User>> GetBySectorId(int sectorId)
+    {
+        return await _context.Users.Where(u => u.SectorId == sectorId).ToListAsync();
+    }
 }
