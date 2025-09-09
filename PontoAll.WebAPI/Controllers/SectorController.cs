@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
+using AutoMapper;
+using PontoAll.WebAPI.Data.Interfaces;
+using PontoAll.WebAPI.Objects.Models;
 
 namespace PontoAll.WebAPI.Controllers;
 
