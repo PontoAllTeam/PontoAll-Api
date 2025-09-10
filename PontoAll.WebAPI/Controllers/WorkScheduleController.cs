@@ -93,7 +93,6 @@ public class WorkScheduleController : Controller
         }
     }
 
-    // NOVO: cadastrar a mesma escala para todos os usuários de um departamento
     [HttpPost("department/{departmentId}")]
     public async Task<IActionResult> PostByDepartment(int departmentId, WorkScheduleDTO workScheduleDTO)
     {
@@ -126,7 +125,6 @@ public class WorkScheduleController : Controller
         }
     }
 
-    // NOVO: cadastrar a mesma escala para todos os usuários de um setor
     [HttpPost("sector/{sectorId}")]
     public async Task<IActionResult> PostBySector(int sectorId, WorkScheduleDTO workScheduleDTO)
     {
@@ -271,7 +269,6 @@ public class WorkScheduleController : Controller
         {
             var value = prop.GetValue(workScheduleDTO);
 
-            // Ignora campos vazios/nulos
             if (value is null) continue;
             if (value is string s && string.IsNullOrWhiteSpace(s)) continue;
 

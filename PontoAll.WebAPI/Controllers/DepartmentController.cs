@@ -13,13 +13,13 @@ namespace PontoAll.WebAPI.Controllers;
 public class DepartmentController : Controller
 {
     private readonly IDepartmentService _departmentService;
-    private readonly IWorkScheduleService _workScheduleService; // + injeta o serviço de escala
+    private readonly IWorkScheduleService _workScheduleService; 
     private readonly Response _response;
 
     public DepartmentController(IDepartmentService departmentService, IWorkScheduleService workScheduleService)
     {
         _departmentService = departmentService;
-        _workScheduleService = workScheduleService; // +
+        _workScheduleService = workScheduleService;
         _response = new Response();
     }
 
