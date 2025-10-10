@@ -93,6 +93,70 @@ public class WorkScheduleController : Controller
         }
     }
 
+    [HttpPost("department/{departmentId}")]
+    public async Task<IActionResult> PostByDepartment(int departmentId, WorkScheduleDTO workScheduleDTO)
+    {
+        if (workScheduleDTO is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Dados inválidos";
+            return BadRequest(_response);
+        }
+
+        try
+        {
+            ValidateWorkSchedule(workScheduleDTO);
+            workScheduleDTO.Id = 0;
+
+            var count = await _workScheduleService.CreateByDepartment(departmentId, workScheduleDTO);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = new { created = count };
+            _response.Message = count > 0 ? "Escalas cadastradas com sucesso para o departamento" : "Nenhum usuário encontrado para o departamento";
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = ex.Message;
+            _response.Data = new { ErrorMessage = ex.Message, StackTrace = ex.StackTrace ?? "No stack trace available" };
+            return BadRequest(_response);
+        }
+    }
+
+    [HttpPost("sector/{sectorId}")]
+    public async Task<IActionResult> PostBySector(int sectorId, WorkScheduleDTO workScheduleDTO)
+    {
+        if (workScheduleDTO is null)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "Dados inválidos";
+            return BadRequest(_response);
+        }
+
+        try
+        {
+            ValidateWorkSchedule(workScheduleDTO);
+            workScheduleDTO.Id = 0;
+
+            var count = await _workScheduleService.CreateBySector(sectorId, workScheduleDTO);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = new { created = count };
+            _response.Message = count > 0 ? "Escalas cadastradas com sucesso para o setor" : "Nenhum usuário encontrado para o setor";
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = ex.Message;
+            _response.Data = new { ErrorMessage = ex.Message, StackTrace = ex.StackTrace ?? "No stack trace available" };
+            return BadRequest(_response);
+        }
+    }
+
     [HttpPut("{id}")]
     public async Task<IActionResult> Put(int id, WorkScheduleDTO workScheduleDTO)
     {
@@ -193,17 +257,20 @@ public class WorkScheduleController : Controller
         if (workScheduleDTO.DayType < 1 || workScheduleDTO.DayType > 7)
             throw new Exception("Dia da semana inválido.");
 
-        // Validação apenas do formato de cada campo de horário
         var pickProperties = typeof(WorkScheduleDTO).GetProperties()
             .Where(p => p.Name.StartsWith("MarkTime"))
             .OrderBy(p => p.Name)
             .ToList();
 
         TimeOnly? previous = null;
+        int validCount = 0;
 
         foreach (var prop in pickProperties)
         {
             var value = prop.GetValue(workScheduleDTO);
+
+            if (value is null) continue;
+            if (value is string s && string.IsNullOrWhiteSpace(s)) continue;
 
             TimeValidator.ValidateTime(value, prop.Name);
 
@@ -211,18 +278,26 @@ public class WorkScheduleController : Controller
             {
                 if (previous.HasValue && current < previous)
                 {
-                    throw new Exception($"{prop.Name} deve ser maior ou igual ao hor�rio anterior.");
+                    throw new Exception($"{prop.Name} deve ser maior ou igual ao horário anterior.");
                 }
                 previous = current;
+                validCount++;
             }
             else if (value is TimeOnly currentTime)
             {
                 if (previous.HasValue && currentTime < previous)
                 {
-                    throw new Exception($"{prop.Name} deve ser maior ou igual ao hor�rio anterior.");
+                    throw new Exception($"{prop.Name} deve ser maior ou igual ao horário anterior.");
                 }
                 previous = currentTime;
+                validCount++;
             }
         }
+
+        if (validCount < 4)
+            throw new Exception("É necessário informar no mínimo 4 marcações de horário válidas.");
+
+        if (validCount % 2 != 0)
+            throw new Exception("A quantidade de marcações deve ser um número par (2, 4, 6, 8 ou 10).");
     }
 }
