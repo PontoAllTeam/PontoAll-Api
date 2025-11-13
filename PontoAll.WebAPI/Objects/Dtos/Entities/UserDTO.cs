@@ -10,8 +10,8 @@ public class UserDTO
     public string RecoveryEmail { get; set; }
     public string Registration { get; set; }
     public string Password { get; set; }
-    public int Type { get; set; }
-    public int Status { get; set; }
+    public int UserType { get; set; }
+    public int UserStatus { get; set; }
     public int CompanyId { get; set; }
     public int SectorId { get; set; }
 }
