@@ -154,8 +154,10 @@ public class UserController : Controller
             }
 
             var token = _tokenService.GenerateToken(userDTO);
+            userDTO.Password = "";
+
             _response.Code = ResponseEnum.SUCCESS;
-            _response.Data = token;
+            _response.Data = new LoginResponse(token, userDTO);
             _response.Message = "Login realizado com sucesso";
 
             return Ok(_response);
