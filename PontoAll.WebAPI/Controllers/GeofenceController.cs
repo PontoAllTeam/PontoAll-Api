@@ -190,27 +190,14 @@ public class GeofenceController : Controller
 
     private static void ValidateGeofencePoints(GeofenceDTO geofenceDTO)
     {
-        var geofencePoints = new List<Geolocation>
+        if (!GeoUtils.IsValidLatitude(geofenceDTO.CenterLatitude))
         {
-            new(geofenceDTO.Point1Lat, geofenceDTO.Point1Lon),
-            new(geofenceDTO.Point2Lat, geofenceDTO.Point2Lon),
-            new(geofenceDTO.Point3Lat, geofenceDTO.Point3Lon)
-        };
+            throw new FormatException("A latitude deve ser maior ou igual a -90 e menor ou igual a 90");
+        }
 
-        if (geofenceDTO.Point4Lat.HasValue && geofenceDTO.Point4Lon.HasValue)
-            geofencePoints.Add(new Geolocation(geofenceDTO.Point4Lat.Value, geofenceDTO.Point4Lon.Value));
-
-        if (geofenceDTO.Point5Lat.HasValue && geofenceDTO.Point5Lon.HasValue)
-            geofencePoints.Add(new Geolocation(geofenceDTO.Point5Lat.Value, geofenceDTO.Point5Lon.Value));
-
-        for(int i = 0; i < geofencePoints.Count; i++)
+        if (!GeoUtils.IsValidLongitude(geofenceDTO.CenterLongitude))
         {
-            var location = geofencePoints[i];
-
-            if (!GeolocationValidator.IsValidGeolocation(location))
-            {
-                throw new FormatException($"Formato da coordenada do ponto {i + 1} incorreto");
-            }
+            throw new FormatException("A longitude deve ser maior ou igual a -180 e menor ou igual a 180");
         }
     }
 }

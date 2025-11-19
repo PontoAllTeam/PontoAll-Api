@@ -83,7 +83,7 @@ public class TimeRecordController : Controller
         try
         {
             var workSchedule = await _workScheduleService.GetById(timeRecordDTO.WorkScheduleId) ?? throw new KeyNotFoundException("Escala não encontrada");
-            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Location, workSchedule.GeofenceId);
+            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Location.Latitude, timeRecordDTO.Location.Longitude, workSchedule.GeofenceId);
             
             if (!isInsideGeofence)
             {

@@ -9,22 +9,14 @@ public class GeofenceBuilder
     {
         modelBuilder.Entity<Geofence>().HasKey(g => g.Id);
         modelBuilder.Entity<Geofence>().Property(g => g.Name).IsRequired().HasMaxLength(100);
-        modelBuilder.Entity<Geofence>().Property(g => g.Name).IsRequired();
+        modelBuilder.Entity<Geofence>().Property(g => g.RadiusInMeters).IsRequired();
+        modelBuilder.Entity<Geofence>().Property(g => g.CenterLatitude).IsRequired();
+        modelBuilder.Entity<Geofence>().Property(g => g.CenterLongitude).IsRequired();
         modelBuilder.Entity<Geofence>().Property(g => g.CompanyId).IsRequired();
-        modelBuilder.Entity<Geofence>().Property(g => g.Point1Lat).IsRequired();
-        modelBuilder.Entity<Geofence>().Property(g => g.Point1Lon).IsRequired();
-        modelBuilder.Entity<Geofence>().Property(g => g.Point2Lat).IsRequired();
-        modelBuilder.Entity<Geofence>().Property(g => g.Point2Lon).IsRequired();
-        modelBuilder.Entity<Geofence>().Property(g => g.Point3Lat).IsRequired();
-        modelBuilder.Entity<Geofence>().Property(g => g.Point3Lon).IsRequired();
-        modelBuilder.Entity<Geofence>().Property(g => g.Point4Lat);
-        modelBuilder.Entity<Geofence>().Property(g => g.Point4Lon);
-        modelBuilder.Entity<Geofence>().Property(g => g.Point5Lat);
-        modelBuilder.Entity<Geofence>().Property(g => g.Point5Lon);
 
         modelBuilder.Entity<Geofence>().HasData(new List<Geofence>
         {
-            new(1, "Pátio 1", 10.0, 10.0, 10.1, 10.1, 10.2, 10.0, null, null, null, null, 1),
+            new(1, "Fatec Jales", 50, -20.27594017626513, -50.54124464159447, 1),
         });
     }
 }
