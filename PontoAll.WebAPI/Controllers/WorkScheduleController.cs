@@ -294,8 +294,8 @@ public class WorkScheduleController : Controller
             }
         }
 
-        if (validCount < 4)
-            throw new Exception("É necessário informar no mínimo 4 marcações de horário válidas.");
+        if (validCount < 2)
+            throw new Exception("É necessário informar no mínimo 2 marcações de horário válidas.");
 
         if (validCount % 2 != 0)
             throw new Exception("A quantidade de marcações deve ser um número par (2, 4, 6, 8 ou 10).");
