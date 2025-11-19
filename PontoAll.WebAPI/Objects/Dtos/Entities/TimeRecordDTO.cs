@@ -15,7 +15,4 @@ public class TimeRecordDTO
     public string Photo { get; set; }
     public int DailyRecordId { get; set; }
     public int WorkScheduleId { get; set; }
-
-    [JsonIgnore]
-    public Geolocation Location => new Geolocation(Latitude, Longitude);
 }

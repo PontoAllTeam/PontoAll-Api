@@ -28,4 +28,10 @@ public class GeoUtils
         // A longitude deve ser maior ou igual a -180 e menor ou igual a 180.
         return longitude >= -180.0 && longitude <= 180.0;
     }
+
+
+    public static bool IsValidGeolocation(double latitude, double longitude)
+    {
+        return IsValidLatitude(latitude) && IsValidLongitude(longitude);
+    }
 }

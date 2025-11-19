@@ -71,7 +71,7 @@ public class TimeRecordController : Controller
             return BadRequest(_response);
         }
 
-        if (!GeolocationValidator.IsValidGeolocation(timeRecordDTO.Location))
+        if (!GeoUtils.IsValidGeolocation(timeRecordDTO.Latitude, timeRecordDTO.Longitude))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
@@ -83,7 +83,7 @@ public class TimeRecordController : Controller
         try
         {
             var workSchedule = await _workScheduleService.GetById(timeRecordDTO.WorkScheduleId) ?? throw new KeyNotFoundException("Escala não encontrada");
-            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Location.Latitude, timeRecordDTO.Location.Longitude, workSchedule.GeofenceId);
+            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Latitude, timeRecordDTO.Longitude, workSchedule.GeofenceId);
             
             if (!isInsideGeofence)
             {
@@ -128,7 +128,7 @@ public class TimeRecordController : Controller
             return BadRequest(_response);
         }
 
-        if (!GeolocationValidator.IsValidGeolocation(timeRecordDTO.Location))
+        if (!GeoUtils.IsValidGeolocation(timeRecordDTO.Latitude, timeRecordDTO.Longitude))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;

@@ -22,7 +22,7 @@ public class TimeRecordBuilder
 
         modelBuilder.Entity<TimeRecord>().HasData(new List<TimeRecord>
         {
-            new(1, date, time, 10.15, 10.15, null, 1, 1, 1),
+            new(1, date, time, 10.15, 10.15, null, 1, 1, 1, ""),
         });
     }
 }
