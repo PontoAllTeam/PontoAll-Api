@@ -246,6 +246,48 @@ public class WorkScheduleController : Controller
         }
     }
 
+    [HttpDelete("department/{departmentId}")]
+    public async Task<IActionResult> DeleteByDepartment(int departmentId, [FromQuery] int dayOfMonth, [FromQuery] string yearMonth)
+    {
+        try
+        {
+            var count = await _workScheduleService.RemoveByDepartment(departmentId, dayOfMonth, yearMonth);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = new { removed = count };
+            _response.Message = count > 0 ? "Escalas removidas com sucesso do departamento" : "Nenhuma escala encontrada para remoção";
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Ocorreu um erro ao tentar remover as escalas";
+            _response.Data = new { ErrorMessage = ex.Message, StackTrace = ex.StackTrace ?? "No stack trace available" };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
+
+    [HttpDelete("sector/{sectorId}")]
+    public async Task<IActionResult> DeleteBySector(int sectorId, [FromQuery] int dayOfMonth, [FromQuery] string yearMonth)
+    {
+        try
+        {
+            var count = await _workScheduleService.RemoveBySector(sectorId, dayOfMonth, yearMonth);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = new { removed = count };
+            _response.Message = count > 0 ? "Escalas removidas com sucesso do setor" : "Nenhuma escala encontrada para remoção";
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Ocorreu um erro ao tentar remover as escalas";
+            _response.Data = new { ErrorMessage = ex.Message, StackTrace = ex.StackTrace ?? "No stack trace available" };
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
+    }
+
     private void ValidateWorkSchedule(WorkScheduleDTO workScheduleDTO)
     {
         if (workScheduleDTO.DayOfMonth < 1 || workScheduleDTO.DayOfMonth > 31)

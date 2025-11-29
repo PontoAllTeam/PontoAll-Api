@@ -46,6 +46,40 @@ public class WorkScheduleService : GenericService<WorkSchedule, WorkScheduleDTO>
         }
         return created;
     }
+
+    public async Task<int> RemoveByDepartment(int departmentId, int dayOfMonth, string yearMonth)
+    {
+        var users = await _userRepository.GetByDepartmentId(departmentId);
+        int removed = 0;
+        foreach (var user in users)
+        {
+            var schedules = await _workScheduleRepository.Get();
+            var toRemove = schedules.Where(s => s.UserId == user.Id && s.DayOfMonth == dayOfMonth && s.YearMonth == yearMonth).ToList();
+            foreach (var schedule in toRemove)
+            {
+                await _workScheduleRepository.Remove(schedule);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    public async Task<int> RemoveBySector(int sectorId, int dayOfMonth, string yearMonth)
+    {
+        var users = await _userRepository.GetBySectorId(sectorId);
+        int removed = 0;
+        foreach (var user in users)
+        {
+            var schedules = await _workScheduleRepository.Get();
+            var toRemove = schedules.Where(s => s.UserId == user.Id && s.DayOfMonth == dayOfMonth && s.YearMonth == yearMonth).ToList();
+            foreach (var schedule in toRemove)
+            {
+                await _workScheduleRepository.Remove(schedule);
+                removed++;
+            }
+        }
+        return removed;
+    }
     private static WorkScheduleDTO CloneTemplate(WorkScheduleDTO t) => new WorkScheduleDTO
     {
         Id = 0,
