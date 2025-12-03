@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Objects.Contracts;
+using PontoAll.WebAPI.Objects.Enums;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -13,11 +14,13 @@ namespace PontoAll.WebAPI.Controllers;
 public class DailyRecordController : Controller
 {
     private readonly IDailyRecordService _dailyRecordService;
+    private readonly IUserService _userService;
     private readonly Response _response;
 
-    public DailyRecordController(IDailyRecordService dailyRecordService)
+    public DailyRecordController(IDailyRecordService dailyRecordService, IUserService userService)
     {
         _dailyRecordService = dailyRecordService;
+        _userService = userService;
         _response = new Response();
     }
 
@@ -64,6 +67,20 @@ public class DailyRecordController : Controller
 
         try
         {
+            if (!await _userService.IsUserActive(dailyRecordDTO.EmployeeId))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Message = "Funcionário inativo ou não encontrado";
+                return BadRequest(_response);
+            }
+
+            if (dailyRecordDTO.ReviewerId.HasValue && !await _userService.IsUserActive(dailyRecordDTO.ReviewerId.Value))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Message = "Revisor inativo ou não encontrado";
+                return BadRequest(_response);
+            }
+
             dailyRecordDTO.Id = 0;
             await _dailyRecordService.Create(dailyRecordDTO);
 

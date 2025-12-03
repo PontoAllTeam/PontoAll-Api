@@ -14,11 +14,13 @@ namespace PontoAll.WebAPI.Controllers;
 public class WorkScheduleController : Controller
 {
     private readonly IWorkScheduleService _workScheduleService;
+    private readonly IUserService _userService;
     private readonly Response _response;
 
-    public WorkScheduleController(IWorkScheduleService workScheduleService)
+    public WorkScheduleController(IWorkScheduleService workScheduleService, IUserService userService)
     {
         _workScheduleService = workScheduleService;
+        _userService = userService;
         _response = new Response();
     }
 
@@ -69,6 +71,14 @@ public class WorkScheduleController : Controller
 
         try
         {
+            if (!await _userService.IsUserActive(workScheduleDTO.UserId))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = "Usuário inativo ou não encontrado";
+                return BadRequest(_response);
+            }
+
             ValidateWorkSchedule(workScheduleDTO);
 
             workScheduleDTO.Id = 0;
