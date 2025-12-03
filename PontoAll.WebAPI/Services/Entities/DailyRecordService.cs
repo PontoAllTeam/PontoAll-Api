@@ -21,8 +21,8 @@ public class DailyRecordService : GenericService<DailyRecord, DailyRecordDTO>, I
     public async Task<int> EnsureDailyRecordExists(int employeeId, int workScheduleId, DateOnly date)
     {
         var dailyRecords = await _dailyRecordRepository.Get();
-        var existingRecord = dailyRecords.FirstOrDefault(dr => 
-            dr.EmployeeId == employeeId && 
+        var existingRecord = dailyRecords.FirstOrDefault(dr =>
+            dr.EmployeeId == employeeId &&
             dr.Date == date);
 
         if (existingRecord != null)
@@ -32,7 +32,7 @@ public class DailyRecordService : GenericService<DailyRecord, DailyRecordDTO>, I
         {
             Date = date,
             TotalWorkedHours = 0,
-            ExpectedHours = 8, // Valor padrão, pode ser ajustado conforme a jornada
+            ExpectedHours = 8,
             OvertimeHours = 0,
             MissingHours = 0,
             IsAbsent = false,
@@ -43,7 +43,7 @@ public class DailyRecordService : GenericService<DailyRecord, DailyRecordDTO>, I
 
         await _dailyRecordRepository.Add(newDailyRecord);
         await _dailyRecordRepository.SaveChanges();
-        
+
         return newDailyRecord.Id;
     }
 }
