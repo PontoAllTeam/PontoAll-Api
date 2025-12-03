@@ -8,4 +8,6 @@ public interface IUserService : IGenericService<User, UserDTO>
 {
     Task<UserDTO> GetByEmail(string email);
     Task<UserDTO> Login(Login login);
+    Task DeactivateUser(int id);
+    Task<bool> IsUserActive(int userId);
 }

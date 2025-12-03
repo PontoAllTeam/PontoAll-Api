@@ -5,6 +5,7 @@ using PontoAll.WebAPI.Objects.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using PontoAll.WebAPI.Services.Utils;
+using PontoAll.WebAPI.Objects.Enums;
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -28,9 +29,10 @@ public class UserController : Controller
     public async Task<IActionResult> GetAll()
     {
         var usersDTO = await _userService.GetAll();
+        var activeUsers = usersDTO.Where(u => u.UserStatus != (int)UserStatus.INACTIVE);
 
         _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = usersDTO;
+        _response.Data = activeUsers;
         _response.Message = "Usuários listados com sucesso";
 
         return Ok(_response);
@@ -41,7 +43,7 @@ public class UserController : Controller
     {
         var userDTO = await _userService.GetById(id);
 
-        if (userDTO is null)
+        if (userDTO is null || userDTO.UserStatus == (int)UserStatus.INACTIVE)
         {
             _response.Code = ResponseEnum.NOT_FOUND;
             _response.Data = null;
@@ -143,7 +145,7 @@ public class UserController : Controller
             login.Password = StringUtils.HashString(login.Password);
             var userDTO = await _userService.Login(login);
 
-            if (userDTO is null)
+            if (userDTO is null || userDTO.UserStatus == (int)UserStatus.INACTIVE)
             {
                 login.Password = "";
                 _response.Code = ResponseEnum.INVALID;
@@ -326,17 +328,17 @@ public class UserController : Controller
                 return NotFound(_response);
             }
 
-            await _userService.Remove(id);
+            await _userService.DeactivateUser(id);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = null;
-            _response.Message = "Usuário removido com sucesso";
+            _response.Message = "Usuário desativado com sucesso";
             return Ok(_response);
         }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
-            _response.Message = "Ocorreu um erro ao tentar remover o usuário";
+            _response.Message = "Ocorreu um erro ao tentar desativar o usuário";
             _response.Data = new
             {
                 ErrorMessage = ex.Message,
