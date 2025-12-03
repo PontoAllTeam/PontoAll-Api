@@ -5,4 +5,5 @@ namespace PontoAll.WebAPI.Services.Interfaces;
 
 public interface IDailyRecordService : IGenericService<DailyRecord, DailyRecordDTO>
 {
+    Task<int> EnsureDailyRecordExists(int employeeId, int workScheduleId, DateOnly date);
 }
