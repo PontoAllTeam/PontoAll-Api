@@ -18,14 +18,16 @@ public class TimeRecordController : Controller
     private readonly IWorkScheduleService _workScheduleService;
     private readonly IGeofenceService _geofenceService;
     private readonly IUserService _userService;
+    private readonly IDailyRecordService _dailyRecordService;
     private readonly Response _response;
 
-    public TimeRecordController(ITimeRecordService timeRecordService, IWorkScheduleService workScheduleService, IGeofenceService geofenceService, IUserService userService)
+    public TimeRecordController(ITimeRecordService timeRecordService, IWorkScheduleService workScheduleService, IGeofenceService geofenceService, IUserService userService, IDailyRecordService dailyRecordService)
     {
         _timeRecordService = timeRecordService;
         _workScheduleService = workScheduleService;
         _geofenceService = geofenceService;
         _userService = userService;
+        _dailyRecordService = dailyRecordService;
         _response = new Response();
     }
 
@@ -107,6 +109,9 @@ public class TimeRecordController : Controller
 
             timeRecordDTO.Id = 0;
             await _timeRecordService.Create(timeRecordDTO);
+
+            // Recalcular valores do DailyRecord
+            await _dailyRecordService.CalculateAndUpdateDailyRecord(timeRecordDTO.DailyRecordId);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = timeRecordDTO;
