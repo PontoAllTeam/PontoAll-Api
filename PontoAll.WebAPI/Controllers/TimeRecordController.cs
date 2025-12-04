@@ -74,7 +74,6 @@ public class TimeRecordController : Controller
             return BadRequest(_response);
         }
 
-        // 1. Validação de GPS
         if (!GeoUtils.IsValidGeolocation(timeRecordDTO.Latitude, timeRecordDTO.Longitude))
         {
             _response.Code = ResponseEnum.INVALID;
@@ -85,7 +84,6 @@ public class TimeRecordController : Controller
 
         try
         {
-            // Validação de Usuário Ativo
             if (!await _userService.IsUserActive(timeRecordDTO.UserId))
             {
                 _response.Code = ResponseEnum.INVALID;
@@ -98,14 +96,11 @@ public class TimeRecordController : Controller
             var serverDate = DateOnly.FromDateTime(serverNow);
             var userId = timeRecordDTO.UserId;
 
-            // --- CORREÇÃO AQUI: BUSCAR PELA DATA, NÃO PELO ID ---
-
-            // Em vez de buscar pelo ID que vem do Android (que é 0), buscamos na lista:
             var allSchedules = await _workScheduleService.GetAll();
 
             var schedule = allSchedules.FirstOrDefault(w =>
                 w.UserId == userId &&
-                w.YearMonth == serverDate.ToString("yyyy/MM") && // Formato que está no banco
+                w.YearMonth == serverDate.ToString("yyyy/MM") &&
                 w.DayOfMonth == serverDate.Day
             );
 
@@ -116,9 +111,7 @@ public class TimeRecordController : Controller
                 _response.Message = $"Não há escala de trabalho configurada para o dia {serverDate:dd/MM/yyyy}.";
                 return NotFound(_response);
             }
-            // ----------------------------------------------------
 
-            // 3. Validação da Geofence
             bool isInsideGeofence = await _geofenceService.IsInsideGeofence(
                 timeRecordDTO.Latitude,
                 timeRecordDTO.Longitude,
@@ -133,20 +126,18 @@ public class TimeRecordController : Controller
                 return BadRequest(_response);
             }
 
-            // 4. Salvar Ponto e Atualizar Diário
             var dailyRecordId = await _dailyRecordService.EnsureDailyRecordExists(userId, schedule.Id, serverDate);
 
             timeRecordDTO.Id = 0;
             timeRecordDTO.DailyRecordId = dailyRecordId;
-            timeRecordDTO.WorkScheduleId = schedule.Id; // Aqui preenchemos com o ID correto que achamos no banco
+            timeRecordDTO.WorkScheduleId = schedule.Id;
             timeRecordDTO.Date = serverDate;
             timeRecordDTO.Time = TimeOnly.FromDateTime(serverNow);
 
             await _timeRecordService.Create(timeRecordDTO);
 
-            // Recalcular valores do DailyRecord (se necessário)
-            // await _dailyRecordService.CalculateAndUpdateDailyRecord(dailyRecordId); 
-            // (Comentei essa linha acima pois não sei se seu método já está pronto, se estiver, pode descomentar)
+            // Recalcular valores do DailyRecord
+            await _dailyRecordService.CalculateAndUpdateDailyRecord(dailyRecordId);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = timeRecordDTO;

@@ -22,12 +22,12 @@ public class TimeRecordService : GenericService<TimeRecord, TimeRecordDTO>, ITim
     public new async Task Create(TimeRecordDTO timeRecordDTO)
     {
         var dailyRecordId = await _dailyRecordService.EnsureDailyRecordExists(
-            timeRecordDTO.UserId, 
-            timeRecordDTO.WorkScheduleId, 
+            timeRecordDTO.UserId,
+            timeRecordDTO.WorkScheduleId,
             timeRecordDTO.Date);
-        
+
         timeRecordDTO.DailyRecordId = dailyRecordId;
-        
+
         await base.Create(timeRecordDTO);
     }
 }
