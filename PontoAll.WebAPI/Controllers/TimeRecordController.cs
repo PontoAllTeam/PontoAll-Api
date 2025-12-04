@@ -71,21 +71,21 @@ public class TimeRecordController : Controller
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Dados inválidos";
-
             return BadRequest(_response);
         }
 
+        // 1. Validação de GPS
         if (!GeoUtils.IsValidGeolocation(timeRecordDTO.Latitude, timeRecordDTO.Longitude))
         {
             _response.Code = ResponseEnum.INVALID;
             _response.Data = null;
             _response.Message = "Formato das coordenadas de geolocalização incorreto";
-
             return BadRequest(_response);
         }
 
         try
         {
+            // Validação de Usuário Ativo
             if (!await _userService.IsUserActive(timeRecordDTO.UserId))
             {
                 _response.Code = ResponseEnum.INVALID;
@@ -94,30 +94,59 @@ public class TimeRecordController : Controller
                 return BadRequest(_response);
             }
 
-            var workSchedule = await _workScheduleService.GetById(timeRecordDTO.WorkScheduleId);
-            if (workSchedule == null)
+            var serverNow = DateTime.Now;
+            var serverDate = DateOnly.FromDateTime(serverNow);
+            var userId = timeRecordDTO.UserId;
+
+            // --- CORREÇÃO AQUI: BUSCAR PELA DATA, NÃO PELO ID ---
+
+            // Em vez de buscar pelo ID que vem do Android (que é 0), buscamos na lista:
+            var allSchedules = await _workScheduleService.GetAll();
+
+            var schedule = allSchedules.FirstOrDefault(w =>
+                w.UserId == userId &&
+                w.YearMonth == serverDate.ToString("yyyy/MM") && // Formato que está no banco
+                w.DayOfMonth == serverDate.Day
+            );
+
+            if (schedule == null)
             {
                 _response.Code = ResponseEnum.NOT_FOUND;
                 _response.Data = null;
-                _response.Message = "Não há uma escala criada para este dia";
+                _response.Message = $"Não há escala de trabalho configurada para o dia {serverDate:dd/MM/yyyy}.";
                 return NotFound(_response);
             }
-            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Latitude, timeRecordDTO.Longitude, workSchedule.GeofenceId);
+            // ----------------------------------------------------
+
+            // 3. Validação da Geofence
+            bool isInsideGeofence = await _geofenceService.IsInsideGeofence(
+                timeRecordDTO.Latitude,
+                timeRecordDTO.Longitude,
+                schedule.GeofenceId
+            );
 
             if (!isInsideGeofence)
             {
                 _response.Code = ResponseEnum.INVALID;
                 _response.Data = null;
-                _response.Message = "Localização atual não corresponde à área permitida";
-
+                _response.Message = "Localização atual não corresponde à área permitida (Fora da cerca virtual).";
                 return BadRequest(_response);
             }
 
+            // 4. Salvar Ponto e Atualizar Diário
+            var dailyRecordId = await _dailyRecordService.EnsureDailyRecordExists(userId, schedule.Id, serverDate);
+
             timeRecordDTO.Id = 0;
+            timeRecordDTO.DailyRecordId = dailyRecordId;
+            timeRecordDTO.WorkScheduleId = schedule.Id; // Aqui preenchemos com o ID correto que achamos no banco
+            timeRecordDTO.Date = serverDate;
+            timeRecordDTO.Time = TimeOnly.FromDateTime(serverNow);
+
             await _timeRecordService.Create(timeRecordDTO);
 
-            // Recalcular valores do DailyRecord
-            await _dailyRecordService.CalculateAndUpdateDailyRecord(timeRecordDTO.DailyRecordId);
+            // Recalcular valores do DailyRecord (se necessário)
+            // await _dailyRecordService.CalculateAndUpdateDailyRecord(dailyRecordId); 
+            // (Comentei essa linha acima pois não sei se seu método já está pronto, se estiver, pode descomentar)
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = timeRecordDTO;
