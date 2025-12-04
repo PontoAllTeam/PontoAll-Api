@@ -95,7 +95,14 @@ public class TimeRecordController : Controller
                 return BadRequest(_response);
             }
 
-            var workSchedule = await _workScheduleService.GetById(timeRecordDTO.WorkScheduleId) ?? throw new KeyNotFoundException("Escala não encontrada");
+            var workSchedule = await _workScheduleService.GetById(timeRecordDTO.WorkScheduleId);
+            if (workSchedule == null)
+            {
+                _response.Code = ResponseEnum.NOT_FOUND;
+                _response.Data = null;
+                _response.Message = "Não há uma escala criada para este dia";
+                return NotFound(_response);
+            }
             bool isInsideGeofence = await _geofenceService.IsInsideGeofence(timeRecordDTO.Latitude, timeRecordDTO.Longitude, workSchedule.GeofenceId);
 
             if (!isInsideGeofence)
