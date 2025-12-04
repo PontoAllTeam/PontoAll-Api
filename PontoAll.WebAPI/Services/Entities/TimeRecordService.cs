@@ -10,17 +10,24 @@ public class TimeRecordService : GenericService<TimeRecord, TimeRecordDTO>, ITim
 {
     private readonly ITimeRecordRepository _timeRecordRepository;
     private readonly IDailyRecordService _dailyRecordService;
+    private readonly IFaceRecognitionService _faceRecognitionService;
+    private readonly IBiometricDataService _biometricDataService;
     private readonly IMapper _mapper;
 
-    public TimeRecordService(ITimeRecordRepository repository, IDailyRecordService dailyRecordService, IMapper mapper) : base(repository, mapper)
+    public TimeRecordService(ITimeRecordRepository repository, IDailyRecordService dailyRecordService, IFaceRecognitionService faceRecognitionService, IBiometricDataService biometricDataService, IMapper mapper) : base(repository, mapper)
     {
         _timeRecordRepository = repository;
         _dailyRecordService = dailyRecordService;
+        _faceRecognitionService = faceRecognitionService;
+        _biometricDataService = biometricDataService;
         _mapper = mapper;
     }
 
     public new async Task Create(TimeRecordDTO timeRecordDTO)
     {
+        // Validar reconhecimento facial se foto fornecida
+        await ValidateFaceRecognition(timeRecordDTO.UserId, timeRecordDTO.Photo);
+
         var dailyRecordId = await _dailyRecordService.EnsureDailyRecordExists(
             timeRecordDTO.UserId,
             timeRecordDTO.WorkScheduleId,
@@ -29,5 +36,18 @@ public class TimeRecordService : GenericService<TimeRecord, TimeRecordDTO>, ITim
         timeRecordDTO.DailyRecordId = dailyRecordId;
 
         await base.Create(timeRecordDTO);
+    }
+
+    private async Task ValidateFaceRecognition(int userId, string photoBase64)
+    {
+        var biometricData = await _biometricDataService.GetByUserId(userId);
+        if (biometricData == null)
+            throw new InvalidOperationException("Dados biométricos não encontrados para o usuário");
+
+        var currentEncoding = _faceRecognitionService.ExtractFaceEncodingFromBase64(photoBase64);
+        var storedEncoding = biometricData.FacialEmbedding.Select(f => (double)f).ToArray();
+
+        if (!_faceRecognitionService.CompareFaces(storedEncoding, currentEncoding))
+            throw new UnauthorizedAccessException("Reconhecimento facial falhou");
     }
 }
