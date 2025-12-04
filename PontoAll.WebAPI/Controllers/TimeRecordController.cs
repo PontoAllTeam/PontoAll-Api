@@ -134,7 +134,24 @@ public class TimeRecordController : Controller
             timeRecordDTO.Date = serverDate;
             timeRecordDTO.Time = TimeOnly.FromDateTime(serverNow);
 
-            await _timeRecordService.Create(timeRecordDTO);
+            try
+            {
+                await _timeRecordService.Create(timeRecordDTO);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = ex.Message;
+                return BadRequest(_response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = ex.Message;
+                return Unauthorized(_response);
+            }
 
             // Recalcular valores do DailyRecord
             await _dailyRecordService.CalculateAndUpdateDailyRecord(dailyRecordId);
