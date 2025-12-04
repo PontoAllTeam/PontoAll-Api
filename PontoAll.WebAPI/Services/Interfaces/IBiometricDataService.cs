@@ -7,4 +7,5 @@ public interface IBiometricDataService : IGenericService<BiometricData, Biometri
 {
     Task<BiometricDataDTO?> GetByUserId(int userId);
     Task SaveFacialEncoding(int userId, double[] encoding);
+    Task SaveAverageFacialEncoding(int userId, double[][] encodings);
 }

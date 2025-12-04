@@ -14,4 +14,5 @@ public class UserDTO
     public int UserStatus { get; set; }
     public int CompanyId { get; set; }
     public int SectorId { get; set; }
+    public string[]? Photos { get; set; }
 }

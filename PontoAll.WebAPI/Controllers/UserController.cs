@@ -79,6 +79,14 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
+        if (userDTO.Photos == null || userDTO.Photos.Length < 3)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "É obrigatório enviar pelo menos 3 fotos para o cadastro";
+            return BadRequest(_response);
+        }
+
         // Validação de e-mail e telefone com mensagens específicas
         try
         {
@@ -106,6 +114,47 @@ public class UserController : Controller
         userDTO.Password = StringUtils.HashString(userDTO.Password);
 
         await _userService.Create(userDTO);
+
+        try
+        {
+            var faceRecognitionService = HttpContext.RequestServices.GetService<IFaceRecognitionService>();
+            var biometricService = HttpContext.RequestServices.GetService<IBiometricDataService>();
+
+            if (faceRecognitionService != null && biometricService != null)
+            {
+                var encodings = new List<double[]>();
+                
+                foreach (var photo in userDTO.Photos)
+                {
+                    try
+                    {
+                        var encoding = faceRecognitionService.ExtractFaceEncodingFromBase64(photo);
+                        encodings.Add(encoding);
+                    }
+                    catch
+                    {
+                        // Ignora fotos que falharam na extração
+                    }
+                }
+                
+                if (encodings.Count < 2)
+                {
+                    _response.Code = ResponseEnum.INVALID;
+                    _response.Data = null;
+                    _response.Message = "Não foi possível processar fotos suficientes. Envie fotos com rostos visíveis";
+                    return BadRequest(_response);
+                }
+                
+                await biometricService.SaveAverageFacialEncoding(userDTO.Id, encodings.ToArray());
+            }
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Data = null;
+            _response.Message = "Erro no processamento das fotos faciais: " + ex.Message;
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
 
         userDTO.Password = "";
         _response.Code = ResponseEnum.SUCCESS;
