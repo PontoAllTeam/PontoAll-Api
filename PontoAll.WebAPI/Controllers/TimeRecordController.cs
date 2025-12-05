@@ -5,6 +5,7 @@ using PontoAll.WebAPI.Objects.Contracts;
 using PontoAll.WebAPI.Objects.Dtos.Entities;
 using PontoAll.WebAPI.Services.Interfaces;
 using PontoAll.WebAPI.Services.Utils;
+using System.Security.Claims; // Necessário para ler Claims padrão se preciso
 
 namespace PontoAll.WebAPI.Controllers;
 
@@ -30,17 +31,48 @@ public class TimeRecordController : Controller
         _response = new Response();
     }
 
+    // --- MÉTODO GETALL MODIFICADO ---
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        var timeRecordsDTO = await _timeRecordService.GetAll();
+        try
+        {
+            // 1. Tenta pegar o ID do Token (claim "id")
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
 
-        _response.Code = ResponseEnum.SUCCESS;
-        _response.Data = timeRecordsDTO;
-        _response.Message = "Marcações de ponto listadas com sucesso";
+            // Se não achar "id", tenta o padrão do .NET "NameIdentifier"
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            }
 
-        return Ok(_response);
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Message = "Token inválido: Não foi possível identificar o usuário.";
+                return Unauthorized(_response);
+            }
+
+            int userId = int.Parse(userIdClaim);
+
+            // 2. Chama o método que filtra pelo ID do usuário
+            var timeRecordsDTO = await _timeRecordService.GetByUserId(userId);
+
+            _response.Code = ResponseEnum.SUCCESS;
+            _response.Data = timeRecordsDTO;
+            _response.Message = "Marcações de ponto listadas com sucesso";
+
+            return Ok(_response);
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Message = "Erro ao listar histórico";
+            _response.Data = new { Error = ex.Message };
+            return BadRequest(_response);
+        }
     }
+    // --------------------------------
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
@@ -98,14 +130,12 @@ public class TimeRecordController : Controller
             var serverDate = DateOnly.FromDateTime(serverNow);
             var userId = timeRecordDTO.UserId;
 
-            // --- CORREÇÃO AQUI: BUSCAR PELA DATA, NÃO PELO ID ---
-
-            // Em vez de buscar pelo ID que vem do Android (que é 0), buscamos na lista:
+            // Busca escala
             var allSchedules = await _workScheduleService.GetAll();
 
             var schedule = allSchedules.FirstOrDefault(w =>
                 w.UserId == userId &&
-                w.YearMonth == serverDate.ToString("yyyy/MM") && // Formato que está no banco
+                w.YearMonth == serverDate.ToString("yyyy/MM") &&
                 w.DayOfMonth == serverDate.Day
             );
 
@@ -116,7 +146,6 @@ public class TimeRecordController : Controller
                 _response.Message = $"Não há escala de trabalho configurada para o dia {serverDate:dd/MM/yyyy}.";
                 return NotFound(_response);
             }
-            // ----------------------------------------------------
 
             // 3. Validação da Geofence
             bool isInsideGeofence = await _geofenceService.IsInsideGeofence(
@@ -138,15 +167,11 @@ public class TimeRecordController : Controller
 
             timeRecordDTO.Id = 0;
             timeRecordDTO.DailyRecordId = dailyRecordId;
-            timeRecordDTO.WorkScheduleId = schedule.Id; // Aqui preenchemos com o ID correto que achamos no banco
+            timeRecordDTO.WorkScheduleId = schedule.Id;
             timeRecordDTO.Date = serverDate;
             timeRecordDTO.Time = TimeOnly.FromDateTime(serverNow);
 
             await _timeRecordService.Create(timeRecordDTO);
-
-            // Recalcular valores do DailyRecord (se necessário)
-            // await _dailyRecordService.CalculateAndUpdateDailyRecord(dailyRecordId); 
-            // (Comentei essa linha acima pois não sei se seu método já está pronto, se estiver, pode descomentar)
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = timeRecordDTO;
