@@ -14,6 +14,7 @@ public class SectorBuilder
         modelBuilder.Entity<Sector>().HasData(new List<Sector>
         {
             new(1, "Recrutamento e Seleção", 2),
+            new(2, "Vendas", 1)
         });
     }
 }
