@@ -63,6 +63,8 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddScoped<IWorkScheduleService, WorkScheduleService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBiometricDataService, BiometricDataService>();
+builder.Services.AddSingleton<IFaceRecognitionService, FaceRecognitionService>();
 builder.Services.AddScoped<ICompanyService, CompanyService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<ISectorService, SectorService>();
@@ -73,6 +75,7 @@ builder.Services.AddScoped<IDailyRecordService, DailyRecordService>();
 //Scoped Repositories and Interfaces
 builder.Services.AddScoped<IWorkScheduleRepository, WorkScheduleRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IBiometricDataRepository, BiometricDataRepository>();
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<ISectorRepository, SectorRepository>();
@@ -117,10 +120,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-// --- COMENTADO PARA EVITAR ERRO DE SSL NO ANDROID ---
-// app.UseHttpsRedirection(); 
-// ----------------------------------------------------
 
 app.UseCors("DefaultPolicy");
 

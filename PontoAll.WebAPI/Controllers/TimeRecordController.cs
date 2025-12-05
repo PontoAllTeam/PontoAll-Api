@@ -106,7 +106,6 @@ public class TimeRecordController : Controller
             return BadRequest(_response);
         }
 
-        // 1. Validação de GPS
         if (!GeoUtils.IsValidGeolocation(timeRecordDTO.Latitude, timeRecordDTO.Longitude))
         {
             _response.Code = ResponseEnum.INVALID;
@@ -117,7 +116,6 @@ public class TimeRecordController : Controller
 
         try
         {
-            // Validação de Usuário Ativo
             if (!await _userService.IsUserActive(timeRecordDTO.UserId))
             {
                 _response.Code = ResponseEnum.INVALID;
@@ -130,7 +128,6 @@ public class TimeRecordController : Controller
             var serverDate = DateOnly.FromDateTime(serverNow);
             var userId = timeRecordDTO.UserId;
 
-            // Busca escala
             var allSchedules = await _workScheduleService.GetAll();
 
             var schedule = allSchedules.FirstOrDefault(w =>
@@ -147,7 +144,6 @@ public class TimeRecordController : Controller
                 return NotFound(_response);
             }
 
-            // 3. Validação da Geofence
             bool isInsideGeofence = await _geofenceService.IsInsideGeofence(
                 timeRecordDTO.Latitude,
                 timeRecordDTO.Longitude,
@@ -162,7 +158,6 @@ public class TimeRecordController : Controller
                 return BadRequest(_response);
             }
 
-            // 4. Salvar Ponto e Atualizar Diário
             var dailyRecordId = await _dailyRecordService.EnsureDailyRecordExists(userId, schedule.Id, serverDate);
 
             timeRecordDTO.Id = 0;
@@ -171,7 +166,27 @@ public class TimeRecordController : Controller
             timeRecordDTO.Date = serverDate;
             timeRecordDTO.Time = TimeOnly.FromDateTime(serverNow);
 
-            await _timeRecordService.Create(timeRecordDTO);
+            try
+            {
+                await _timeRecordService.Create(timeRecordDTO);
+            }
+            catch (InvalidOperationException ex)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = ex.Message;
+                return BadRequest(_response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = ex.Message;
+                return Unauthorized(_response);
+            }
+
+            // Recalcular valores do DailyRecord
+            await _dailyRecordService.CalculateAndUpdateDailyRecord(dailyRecordId);
 
             _response.Code = ResponseEnum.SUCCESS;
             _response.Data = timeRecordDTO;

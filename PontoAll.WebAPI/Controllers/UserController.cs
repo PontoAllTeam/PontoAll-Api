@@ -79,6 +79,14 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
+        if (userDTO.Photos == null || userDTO.Photos.Length < 3)
+        {
+            _response.Code = ResponseEnum.INVALID;
+            _response.Data = null;
+            _response.Message = "É obrigatório enviar pelo menos 3 fotos para o cadastro";
+            return BadRequest(_response);
+        }
+
         // Validação de e-mail e telefone com mensagens específicas
         try
         {
@@ -102,10 +110,70 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
-        userDTO.Id = 0;
-        userDTO.Password = StringUtils.HashString(userDTO.Password);
+        // Validar fotos ANTES de criar o usuário
+        try
+        {
+            var faceRecognitionService = HttpContext.RequestServices.GetService<IFaceRecognitionService>();
+            var biometricService = HttpContext.RequestServices.GetService<IBiometricDataService>();
 
-        await _userService.Create(userDTO);
+            if (faceRecognitionService == null)
+            {
+                _response.Code = ResponseEnum.ERROR;
+                _response.Data = null;
+                _response.Message = "Serviço de reconhecimento facial não encontrado";
+                return StatusCode(StatusCodes.Status500InternalServerError, _response);
+            }
+
+            if (biometricService == null)
+            {
+                _response.Code = ResponseEnum.ERROR;
+                _response.Data = null;
+                _response.Message = "Serviço biométrico não encontrado";
+                return StatusCode(StatusCodes.Status500InternalServerError, _response);
+            }
+
+            var encodings = new List<double[]>();
+            var errors = new List<string>();
+            
+            for (int i = 0; i < userDTO.Photos.Length; i++)
+            {
+                try
+                {
+                    var encoding = faceRecognitionService.ExtractFaceEncodingFromBase64(userDTO.Photos[i]);
+                    encodings.Add(encoding);
+                }
+                catch (Exception photoEx)
+                {
+                    errors.Add($"Foto {i + 1}: {photoEx.Message}");
+                }
+            }
+            
+            if (encodings.Count < 2)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = $"Não foi possível processar fotos suficientes. Processadas: {encodings.Count}/{userDTO.Photos.Length}. Erros: {string.Join("; ", errors)}";
+                return BadRequest(_response);
+            }
+
+            // Só cria o usuário se as fotos foram validadas
+            userDTO.Id = 0;
+            userDTO.Password = StringUtils.HashString(userDTO.Password);
+            await _userService.Create(userDTO);
+            
+            // Busca o usuário criado para obter o ID
+            var createdUser = await _userService.GetByEmail(userDTO.Email);
+            
+            // Salva os encodings faciais usando o ID do usuário criado
+            await biometricService.SaveAverageFacialEncoding(createdUser.Id, encodings.ToArray());
+        }
+        catch (Exception ex)
+        {
+            _response.Code = ResponseEnum.ERROR;
+            _response.Data = null;
+            _response.Message = "Erro no processamento das fotos faciais";
+            return StatusCode(StatusCodes.Status500InternalServerError, _response);
+        }
 
         userDTO.Password = "";
         _response.Code = ResponseEnum.SUCCESS;
