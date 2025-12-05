@@ -2,17 +2,17 @@
 
 public class ConverterUtils
 {
-    public static byte[] FloatArrayToByteArray(float[] floats)
+    public static byte[] DoubleArrayToByteArray(double[] doubles)
     {
-        var bytes = new byte[floats.Length * sizeof(float)];
-        Buffer.BlockCopy(floats, 0, bytes, 0, bytes.Length);
+        var bytes = new byte[doubles.Length * sizeof(double)];
+        Buffer.BlockCopy(doubles, 0, bytes, 0, bytes.Length);
         return bytes;
     }
 
-    public static float[] ByteArrayToFloatArray(byte[] bytes)
+    public static double[] ByteArrayToDoubleArray(byte[] bytes)
     {
-        var floats = new float[bytes.Length / sizeof(float)];
-        Buffer.BlockCopy(bytes, 0, floats, 0, bytes.Length);
-        return floats;
+        var doubles = new double[bytes.Length / sizeof(double)];
+        Buffer.BlockCopy(bytes, 0, doubles, 0, bytes.Length);
+        return doubles;
     }
 }

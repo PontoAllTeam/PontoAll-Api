@@ -9,7 +9,7 @@ public class BiometricData
     public int Id { get; set; }
 
     [Column("facialembedding")]
-    public float[] FacialEmbedding { get; set; } = [];
+    public double[] FacialEmbedding { get; set; } = [];
 
     [Column("createdat")]
     public DateTime CreatedAt { get; set; }
@@ -20,7 +20,7 @@ public class BiometricData
 
     public BiometricData() { }
 
-    public BiometricData(int id, float[] facialEmbedding, DateTime createdAt, int userId)
+    public BiometricData(int id, double[] facialEmbedding, DateTime createdAt, int userId)
     {
         Id = id;
         FacialEmbedding = facialEmbedding;

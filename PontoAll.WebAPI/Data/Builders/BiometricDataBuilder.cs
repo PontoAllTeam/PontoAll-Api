@@ -9,19 +9,19 @@ public class BiometricDataBuilder
 {
     public static void Build(ModelBuilder modelBuilder)
     {
-        var floatArrayToBytesConverter = new ValueConverter<float[], byte[]>(
-            v => ConverterUtils.FloatArrayToByteArray(v),
-            v => ConverterUtils.ByteArrayToFloatArray(v));
+        var doubleArrayToBytesConverter = new ValueConverter<double[], byte[]>(
+            v => ConverterUtils.DoubleArrayToByteArray(v),
+            v => ConverterUtils.ByteArrayToDoubleArray(v));
 
         modelBuilder.Entity<BiometricData>().HasKey(b => b.Id);
         modelBuilder.Entity<BiometricData>()
             .Property(b => b.FacialEmbedding)
-            .HasConversion(floatArrayToBytesConverter)
+            .HasConversion(doubleArrayToBytesConverter)
             .HasColumnType("bytea").IsRequired();
         modelBuilder.Entity<BiometricData>().Property(b => b.CreatedAt).IsRequired();
         modelBuilder.Entity<BiometricData>().Property(b => b.UserId).IsRequired();
 
-        var embedding = new float[] { 0.123f, 0.456f, 0.789f };
+        var embedding = new double[] { 0.123f, 0.456f, 0.789f };
         var createdAt = new DateTime(2025, 6, 22, 12, 50, 20, DateTimeKind.Utc);
 
         modelBuilder.Entity<BiometricData>().HasData(new List<BiometricData>
