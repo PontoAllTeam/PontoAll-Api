@@ -110,49 +110,68 @@ public class UserController : Controller
             return BadRequest(_response);
         }
 
-        userDTO.Id = 0;
-        userDTO.Password = StringUtils.HashString(userDTO.Password);
-
-        await _userService.Create(userDTO);
-
+        // Validar fotos ANTES de criar o usuário
         try
         {
             var faceRecognitionService = HttpContext.RequestServices.GetService<IFaceRecognitionService>();
             var biometricService = HttpContext.RequestServices.GetService<IBiometricDataService>();
 
-            if (faceRecognitionService != null && biometricService != null)
+            if (faceRecognitionService == null)
             {
-                var encodings = new List<double[]>();
-                
-                foreach (var photo in userDTO.Photos)
-                {
-                    try
-                    {
-                        var encoding = faceRecognitionService.ExtractFaceEncodingFromBase64(photo);
-                        encodings.Add(encoding);
-                    }
-                    catch
-                    {
-                        // Ignora fotos que falharam na extração
-                    }
-                }
-                
-                if (encodings.Count < 2)
-                {
-                    _response.Code = ResponseEnum.INVALID;
-                    _response.Data = null;
-                    _response.Message = "Não foi possível processar fotos suficientes. Envie fotos com rostos visíveis";
-                    return BadRequest(_response);
-                }
-                
-                await biometricService.SaveAverageFacialEncoding(userDTO.Id, encodings.ToArray());
+                _response.Code = ResponseEnum.ERROR;
+                _response.Data = null;
+                _response.Message = "Serviço de reconhecimento facial não encontrado";
+                return StatusCode(StatusCodes.Status500InternalServerError, _response);
             }
+
+            if (biometricService == null)
+            {
+                _response.Code = ResponseEnum.ERROR;
+                _response.Data = null;
+                _response.Message = "Serviço biométrico não encontrado";
+                return StatusCode(StatusCodes.Status500InternalServerError, _response);
+            }
+
+            var encodings = new List<double[]>();
+            var errors = new List<string>();
+            
+            for (int i = 0; i < userDTO.Photos.Length; i++)
+            {
+                try
+                {
+                    var encoding = faceRecognitionService.ExtractFaceEncodingFromBase64(userDTO.Photos[i]);
+                    encodings.Add(encoding);
+                }
+                catch (Exception photoEx)
+                {
+                    errors.Add($"Foto {i + 1}: {photoEx.Message}");
+                }
+            }
+            
+            if (encodings.Count < 2)
+            {
+                _response.Code = ResponseEnum.INVALID;
+                _response.Data = null;
+                _response.Message = $"Não foi possível processar fotos suficientes. Processadas: {encodings.Count}/{userDTO.Photos.Length}. Erros: {string.Join("; ", errors)}";
+                return BadRequest(_response);
+            }
+
+            // Só cria o usuário se as fotos foram validadas
+            userDTO.Id = 0;
+            userDTO.Password = StringUtils.HashString(userDTO.Password);
+            await _userService.Create(userDTO);
+            
+            // Busca o usuário criado para obter o ID
+            var createdUser = await _userService.GetByEmail(userDTO.Email);
+            
+            // Salva os encodings faciais usando o ID do usuário criado
+            await biometricService.SaveAverageFacialEncoding(createdUser.Id, encodings.ToArray());
         }
         catch (Exception ex)
         {
             _response.Code = ResponseEnum.ERROR;
             _response.Data = null;
-            _response.Message = "Erro no processamento das fotos faciais: " + ex.Message;
+            _response.Message = "Erro no processamento das fotos faciais";
             return StatusCode(StatusCodes.Status500InternalServerError, _response);
         }
 

@@ -30,16 +30,24 @@ public class FaceRecognitionService : IFaceRecognitionService, IDisposable
 
     public double[] ExtractFaceEncoding(byte[] imageBytes)
     {
-        using var stream = new MemoryStream(imageBytes);
-        using var bitmap = new System.Drawing.Bitmap(stream);
-        using var image = FaceRecognition.LoadImage(bitmap);
-        var locations = _faceRecognition.FaceLocations(image);
+        var tempFile = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllBytes(tempFile, imageBytes);
+            using var image = FaceRecognition.LoadImageFile(tempFile);
+            var locations = _faceRecognition.FaceLocations(image);
 
-        if (!locations.Any())
-            throw new InvalidOperationException("Nenhum rosto detectado na imagem");
+            if (!locations.Any())
+                throw new InvalidOperationException("Nenhum rosto detectado na imagem");
 
-        var encodings = _faceRecognition.FaceEncodings(image, locations);
-        return encodings.First().GetRawEncoding();
+            var encodings = _faceRecognition.FaceEncodings(image, locations);
+            return encodings.First().GetRawEncoding();
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+                File.Delete(tempFile);
+        }
     }
 
     public bool CompareFaces(double[] knownEncoding, double[] unknownEncoding, double threshold = 0.6)
